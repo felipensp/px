@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -g
-OBJECTS=main.o cmd.o
+OBJECTS=main.o cmd.o trace.o
 
 px: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^

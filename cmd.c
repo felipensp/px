@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cmd.h"
+#include "trace.h"
 
 /**
  * quit operation handler
@@ -42,7 +43,9 @@ void px_quit_handler(const char* params) {
  * attach <pid>
  */
 void px_attach_handler(const char* params) {
-	printf("attaching... %s\n", params);
+	long pid = strtol(params, NULL, 10);
+
+	px_trace_pid(pid);
 }
 
 /**
@@ -50,16 +53,18 @@ void px_attach_handler(const char* params) {
  * run <file>
  */
 void px_run_handler(const char* params) {
+	char *args, *proc = strtok_r((char*)params, " ", &args);
 
+	px_trace_prog(proc, args);
 }
 
 /**
  * Commands
  */
 static const px_command commands[] = {
-	{PX_STRL("quit"), px_quit_handler},
+	{PX_STRL("quit"),   px_quit_handler  },
 	{PX_STRL("attach"), px_attach_handler},
-	{PX_STRL("run"), px_run_handler},
+	{PX_STRL("run"),    px_run_handler   },
 	{NULL, 0, NULL}
 };
 
@@ -76,6 +81,7 @@ void handle_cmd(char *cmd) {
 			if (op_len == cmd_ptr->cmd_len
 				&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
 				cmd_ptr->handler(params);
+				return;
 			}
 			cmd_ptr++;
 		}
