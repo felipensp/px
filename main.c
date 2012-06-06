@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 	}
 
 	printf(PX_PROMPT);
-	memset(cmd, 0, PX_MAX_CMD_LEN+1);
+	memset(cmd, 0, sizeof(cmd));
 
 	while (fgets(cmd, PX_MAX_CMD_LEN, stdin) != NULL) {
 		cmd_len = strlen(cmd) - 1;
