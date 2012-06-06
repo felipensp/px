@@ -108,8 +108,6 @@ int main(int argc, char **argv) {
 				cmd[cmd_len] = '\0';
 			}
 			handle_cmd(cmd);
-		} else {
-			ignore = 0;
 		}
 		printf(PX_PROMPT);
 	}
