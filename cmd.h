@@ -30,7 +30,7 @@
 /**
  * Helper macros
  */
-#define PX_STRL(x) x, sizeof(x)
+#define PX_STRL(x) x, sizeof(x)-1
 
 /**
  * Prompt settings
@@ -46,9 +46,6 @@ typedef struct _px_command {
 	px_command_handler handler;
 } px_command;
 
-/**
- * Handlers
- */
-void px_quit_handler(void);
+void prompt_cmd();
 
 #endif /* PX_CMD */

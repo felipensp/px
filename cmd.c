@@ -26,9 +26,72 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "cmd.h"
 
+/**
+ * quit operation handler
+ */
 void px_quit_handler(void) {
 	printf("quit!\n");
 	exit(0);
+}
+
+/**
+ * Commands
+ */
+static const px_command commands[] = {
+	{PX_STRL("quit"), px_quit_handler},
+	{NULL, 0, NULL}
+};
+
+/**
+ * Handles the command execution
+ */
+void handle_cmd(char *cmd) {
+	char *params, *op = strtok_r(cmd, " ", &params);
+	const px_command *cmd_ptr = commands;
+	size_t op_len = params - op;
+
+	while (cmd_ptr->cmd) {
+		if (op_len == cmd_ptr->cmd_len
+			&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
+			cmd_ptr->handler();
+		}
+		cmd_ptr++;
+	}
+
+	printf("Command not found!\n");
+}
+
+/**
+ * Prompt
+ */
+void prompt_cmd() {
+	char cmd[PX_MAX_CMD_LEN];
+	int ignore = 0, cmd_len;
+
+	printf(PX_PROMPT);
+	memset(cmd, 0, sizeof(cmd));
+
+	while (fgets(cmd, PX_MAX_CMD_LEN, stdin) != NULL) {
+		cmd_len = strlen(cmd) - 1;
+
+		if (ignore == 1) {
+			if (cmd[cmd_len] == '\n') {
+				ignore = 0;
+			}
+			continue;
+		}
+
+		if (cmd[0] != '\n') {
+			if (cmd[cmd_len] != '\n') {
+				ignore = 1;
+			} else {
+				cmd[cmd_len] = '\0';
+			}
+			handle_cmd(cmd);
+		}
+		printf(PX_PROMPT);
+	}
 }

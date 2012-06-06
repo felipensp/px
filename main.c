@@ -26,19 +26,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <getopt.h>
 #include "cmd.h"
 
 #define PX_VERSION "0.1.0"
-
-/**
- * Commands
- */
-static const px_command commands[] = {
-	{PX_STRL("quit"), px_quit_handler},
-	{NULL, 0, NULL}
-};
 
 /**
  * Displays the usage of px
@@ -49,26 +40,9 @@ static void usage() {
 			"	-h, --help	Displays this information\n");
 }
 
-/**
- * Handles the command execution
- */
-void handle_cmd(char *cmd) {
-	char *params, *op = strtok_r(cmd, " ", &params);
-	const px_command *cmd_ptr = commands;
-
-	while (cmd_ptr->cmd) {
-		if (memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
-			cmd_ptr->handler();
-		}
-		cmd_ptr++;
-	}
-
-	printf("Command not found!\n");
-}
-
 int main(int argc, char **argv) {
-	char c, cmd[PX_MAX_CMD_LEN];
-	int ignore = 0, cmd_len, opt_index = 0;
+	char c;
+	int opt_index = 0;
 	static struct option long_opts[] = {
 		{"help", no_argument, 0, 'h'},
 		{0, 0, 0, 0}
@@ -88,29 +62,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	printf(PX_PROMPT);
-	memset(cmd, 0, sizeof(cmd));
-
-	while (fgets(cmd, PX_MAX_CMD_LEN, stdin) != NULL) {
-		cmd_len = strlen(cmd) - 1;
-
-		if (ignore == 1) {
-			if (cmd[cmd_len] == '\n') {
-				ignore = 0;
-			}
-			continue;
-		}
-
-		if (cmd[0] != '\n') {
-			if (cmd[cmd_len] != '\n') {
-				ignore = 1;
-			} else {
-				cmd[cmd_len] = '\0';
-			}
-			handle_cmd(cmd);
-		}
-		printf(PX_PROMPT);
-	}
+	prompt_cmd();
 
 	return 0;
 }
