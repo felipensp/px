@@ -25,16 +25,29 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 #include "cmd.h"
+
+#define PX_VERSION "0.1.0"
 
 /**
  * Commands
  */
 static const px_command commands[] = {
-	{ PX_STRL("quit"), px_quit_handler },
-	{ NULL, 0, NULL }
+	{PX_STRL("quit"), px_quit_handler},
+	{NULL, 0, NULL}
 };
+
+/**
+ * Displays the usage of px
+ */
+static void usage() {
+	printf("Usage: px [options]\n\n"
+			"Options:\n"
+			"	-h, --help	Displays this information\n");
+}
 
 /**
  * Handles the command execution
@@ -51,16 +64,32 @@ void handle_cmd(char *cmd) {
 	}
 
 	printf("Command not found!\n");
-	fflush(stdin);
 }
 
 int main(int argc, char **argv) {
-	char cmd[PX_MAX_CMD_LEN];
-	int ignore = 0, cmd_len;
+	char c, cmd[PX_MAX_CMD_LEN];
+	int ignore = 0, cmd_len, opt_index = 0;
+	static struct option long_opts[] = {
+		{"help", no_argument, 0, 'h'},
+		{0, 0, 0, 0}
+	};
 
-	memset(cmd, 0, PX_MAX_CMD_LEN+1);
+	printf("px - Process Examinator (" PX_VERSION ")\n");
+
+	if (argc > 1) {
+		while ((c = getopt_long(argc, argv, "h", long_opts, &opt_index)) != -1) {
+			switch (c) {
+				case 'h':
+					usage();
+					exit(0);
+				case '?':
+					break;
+			}
+		}
+	}
 
 	printf(PX_PROMPT);
+	memset(cmd, 0, PX_MAX_CMD_LEN+1);
 
 	while (fgets(cmd, PX_MAX_CMD_LEN, stdin) != NULL) {
 		cmd_len = strlen(cmd) - 1;
