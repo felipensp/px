@@ -38,7 +38,7 @@
 #define PX_PROMPT "px!> "
 #define PX_MAX_CMD_LEN 100
 
-typedef void (*px_command_handler)(void);
+typedef void (*px_command_handler)(const char*);
 
 typedef struct _px_command {
 	const char *cmd;

@@ -32,9 +32,25 @@
 /**
  * quit operation handler
  */
-void px_quit_handler(void) {
+void px_quit_handler(const char* params) {
 	printf("quit!\n");
 	exit(0);
+}
+
+/**
+ * attach operation handler
+ * attach <pid>
+ */
+void px_attach_handler(const char* params) {
+	printf("attaching... %s\n", params);
+}
+
+/**
+ * run operation handler
+ * run <file>
+ */
+void px_run_handler(const char* params) {
+
 }
 
 /**
@@ -42,6 +58,8 @@ void px_quit_handler(void) {
  */
 static const px_command commands[] = {
 	{PX_STRL("quit"), px_quit_handler},
+	{PX_STRL("attach"), px_attach_handler},
+	{PX_STRL("run"), px_run_handler},
 	{NULL, 0, NULL}
 };
 
@@ -51,14 +69,16 @@ static const px_command commands[] = {
 void handle_cmd(char *cmd) {
 	char *params, *op = strtok_r(cmd, " ", &params);
 	const px_command *cmd_ptr = commands;
-	size_t op_len = params - op;
+	size_t op_len = op ? strlen(op) : 0;
 
-	while (cmd_ptr->cmd) {
-		if (op_len == cmd_ptr->cmd_len
-			&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
-			cmd_ptr->handler();
+	if (op) {
+		while (cmd_ptr->cmd) {
+			if (op_len == cmd_ptr->cmd_len
+				&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
+				cmd_ptr->handler(params);
+			}
+			cmd_ptr++;
 		}
-		cmd_ptr++;
 	}
 
 	printf("Command not found!\n");
