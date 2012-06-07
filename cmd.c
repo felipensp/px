@@ -54,7 +54,7 @@ static void px_attach_handler(const char* params) {
 
 /**
  * run operation handler
- * run <file>
+ * run <file> <args>
  */
 static void px_run_handler(const char* params) {
 	char *args, *proc = strtok_r((char*)params, " ", &args);
