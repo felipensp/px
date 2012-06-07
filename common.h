@@ -24,41 +24,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PX_CMD
-#define PX_CMD
-
-#include <sys/types.h>
+#ifndef PX_COMMON
+#define PX_COMMON
 
 /**
- * Prompt settings
+ * Helper macros
  */
-#define PX_PROMPT "px!> "
-#define PX_MAX_CMD_LEN 100
+#define px_safe_free(x) do { if (x) { free(x); } } while (0)
 
-typedef struct _px_env {
-	struct {
-		enum {
-			TRACE_NONE,
-			TRACE_BY_PID,
-			TRACE_BY_NAME
-		} mode;
-		union {
-			char *prog[2];
-			pid_t pid;
-		} data;
-	} trace;
-} px_env;
+#define px_error(msg, ...) fprintf(stderr, "Error: " msg "\n", ##__VA_ARGS__)
 
-typedef void (*px_command_handler)(const char*);
-
-typedef struct _px_command {
-	const char *cmd;
-	size_t cmd_len;
-	px_command_handler handler;
-} px_command;
-
-void prompt_cmd();
-
-extern px_env g_env;
-
-#endif /* PX_CMD */
+#endif /* PX_COMMON */
