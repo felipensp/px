@@ -41,7 +41,7 @@ px_env g_env;
 /**
  * Finds and call a handler if found
  */
-static int _px_find_cmd(const px_command* cmd_list, char *cmd) {
+static int _px_find_cmd(const px_command *cmd_list, char *cmd) {
 	char *params, *op = strtok_r(cmd, " ", &params);
 	const px_command *cmd_ptr = cmd_list;
 	size_t op_len = op ? strlen(op) : 0;
@@ -62,7 +62,7 @@ static int _px_find_cmd(const px_command* cmd_list, char *cmd) {
 /**
  * quit operation handler
  */
-static void _px_quit_handler(const char* params) {
+static void _px_quit_handler(const char *params) {
 	printf("quit!\n");
 	exit(0);
 }
@@ -71,7 +71,7 @@ static void _px_quit_handler(const char* params) {
  * attach operation handler
  * attach <pid>
  */
-static void _px_attach_handler(const char* params) {
+static void _px_attach_handler(const char *params) {
 	long pid = strtol(params, NULL, 10);
 
 	g_env.trace.mode = TRACE_BY_PID;
@@ -82,7 +82,7 @@ static void _px_attach_handler(const char* params) {
  * run operation handler
  * run <file> <args>
  */
-static void _px_run_handler(const char* params) {
+static void _px_run_handler(const char *params) {
 	char *args, *proc = strtok_r((char*)params, " ", &args);
 
 	g_env.trace.mode = TRACE_BY_PID;
@@ -94,7 +94,7 @@ static void _px_run_handler(const char* params) {
  * trace operation handler
  * trace
  */
-static void _px_trace_handler(const char* params) {
+static void _px_trace_handler(const char *params) {
 	switch (g_env.trace.mode) {
 		case TRACE_NONE:
 			px_error("No program information to start tracing "
@@ -112,7 +112,7 @@ static void _px_trace_handler(const char* params) {
 /**
  * Dumps all /proc/<pid>/maps information
  */
-static void _px_show_maps_handler(const char* params) {
+static void _px_show_maps_handler(const char *params) {
 	char fname[PATH_MAX], buf[200];
 	int fd, size;
 
@@ -134,7 +134,7 @@ static void _px_show_maps_handler(const char* params) {
  * show operation handler
  * show <maps | perms>
  */
-static void _px_show_handler(const char* params) {
+static void _px_show_handler(const char *params) {
 	static const px_command _commands[] = {
 		{PX_STRL("maps"), _px_show_maps_handler},
 		{NULL, 0, NULL}
