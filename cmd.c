@@ -36,7 +36,7 @@ px_env g_env;
 /**
  * quit operation handler
  */
-static void px_quit_handler(const char* params) {
+static void _px_quit_handler(const char* params) {
 	printf("quit!\n");
 	exit(0);
 }
@@ -45,7 +45,7 @@ static void px_quit_handler(const char* params) {
  * attach operation handler
  * attach <pid>
  */
-static void px_attach_handler(const char* params) {
+static void _px_attach_handler(const char* params) {
 	long pid = strtol(params, NULL, 10);
 
 	g_env.trace.mode = TRACE_BY_PID;
@@ -56,7 +56,7 @@ static void px_attach_handler(const char* params) {
  * run operation handler
  * run <file> <args>
  */
-static void px_run_handler(const char* params) {
+static void _px_run_handler(const char* params) {
 	char *args, *proc = strtok_r((char*)params, " ", &args);
 
 	g_env.trace.mode = TRACE_BY_PID;
@@ -68,7 +68,7 @@ static void px_run_handler(const char* params) {
  * trace operation handler
  * trace
  */
-static void px_trace_handler(const char* params) {
+static void _px_trace_handler(const char* params) {
 	switch (g_env.trace.mode) {
 		case TRACE_NONE:
 			px_error("No program information to start tracing "
@@ -86,7 +86,7 @@ static void px_trace_handler(const char* params) {
 /**
  * Deallocs dynamic memory alloc'ed to the environment data
  */
-static void px_free_env() {
+static void _px_free_env() {
 	if (g_env.trace.mode == TRACE_BY_NAME &&
 		g_env.trace.data.prog[0] != NULL) {
 		px_safe_free(g_env.trace.data.prog[0]);
@@ -99,10 +99,10 @@ static void px_free_env() {
  */
 #define PX_STRL(x) x, sizeof(x)-1
 static const px_command commands[] = {
-	{PX_STRL("quit"),   px_quit_handler  },
-	{PX_STRL("attach"), px_attach_handler},
-	{PX_STRL("run"),    px_run_handler   },
-	{PX_STRL("trace"),  px_trace_handler },
+	{PX_STRL("quit"),   _px_quit_handler  },
+	{PX_STRL("attach"), _px_attach_handler},
+	{PX_STRL("run"),    _px_run_handler   },
+	{PX_STRL("trace"),  _px_trace_handler },
 	{NULL, 0, NULL}
 };
 #undef PX_STRL
@@ -110,7 +110,7 @@ static const px_command commands[] = {
 /**
  * Handles the command execution
  */
-static void handle_cmd(char *cmd) {
+static void _px_find_cmd(char *cmd) {
 	char *params, *op = strtok_r(cmd, " ", &params);
 	const px_command *cmd_ptr = commands;
 	size_t op_len = op ? strlen(op) : 0;
@@ -132,7 +132,7 @@ static void handle_cmd(char *cmd) {
 /**
  * Prompt
  */
-void prompt_cmd() {
+void px_prompt() {
 	char cmd[PX_MAX_CMD_LEN];
 	int ignore = 0, cmd_len;
 
@@ -155,10 +155,10 @@ void prompt_cmd() {
 			} else {
 				cmd[cmd_len] = '\0';
 			}
-			handle_cmd(cmd);
+			_px_find_cmd(cmd);
 		}
 		printf(PX_PROMPT);
 	}
 
-	px_free_env();
+	_px_free_env();
 }

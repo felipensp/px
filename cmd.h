@@ -57,7 +57,7 @@ typedef struct _px_command {
 	px_command_handler handler;
 } px_command;
 
-void prompt_cmd();
+void px_prompt();
 
 extern px_env g_env;
 
