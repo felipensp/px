@@ -33,7 +33,7 @@
 /**
  * quit operation handler
  */
-void px_quit_handler(const char* params) {
+static void px_quit_handler(const char* params) {
 	printf("quit!\n");
 	exit(0);
 }
@@ -42,7 +42,7 @@ void px_quit_handler(const char* params) {
  * attach operation handler
  * attach <pid>
  */
-void px_attach_handler(const char* params) {
+static void px_attach_handler(const char* params) {
 	long pid = strtol(params, NULL, 10);
 
 	px_trace_pid(pid);
@@ -52,7 +52,7 @@ void px_attach_handler(const char* params) {
  * run operation handler
  * run <file>
  */
-void px_run_handler(const char* params) {
+static void px_run_handler(const char* params) {
 	char *args, *proc = strtok_r((char*)params, " ", &args);
 
 	px_trace_prog(proc, args);
@@ -83,7 +83,7 @@ void handle_cmd(char *cmd) {
 				cmd_ptr->handler(params);
 				return;
 			}
-			cmd_ptr++;
+			++cmd_ptr;
 		}
 	}
 
