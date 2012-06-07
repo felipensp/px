@@ -27,11 +27,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <limits.h>
 #include "common.h"
 #include "cmd.h"
 #include "trace.h"
 
 px_env g_env;
+
+#define PX_STRL(x) x, sizeof(x)-1
+
+/**
+ * Finds and call a handler if found
+ */
+static int _px_find_cmd(const px_command* cmd_list, char *cmd) {
+	char *params, *op = strtok_r(cmd, " ", &params);
+	const px_command *cmd_ptr = cmd_list;
+	size_t op_len = op ? strlen(op) : 0;
+
+	if (op) {
+		while (cmd_ptr->cmd) {
+			if (op_len == cmd_ptr->cmd_len
+				&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
+				cmd_ptr->handler(params);
+				return 1;
+			}
+			++cmd_ptr;
+		}
+	}
+	return 0;
+}
 
 /**
  * quit operation handler
@@ -84,6 +110,42 @@ static void _px_trace_handler(const char* params) {
 }
 
 /**
+ * Dumps all /proc/<pid>/maps information
+ */
+static void _px_show_maps_handler(const char* params) {
+	char fname[PATH_MAX], buf[200];
+	int fd, size;
+
+	snprintf(fname, sizeof(fname), "/proc/%d/maps", g_env.trace.data.pid);
+
+	if ((fd = open(fname, O_RDONLY)) == -1) {
+		px_error("Fail to open '%s'", fname);
+		return;
+	}
+
+	while ((size = read(fd, buf, sizeof(buf)))) {
+		printf("%.*s", size, buf);
+	}
+
+	close(fd);
+}
+
+/**
+ * show operation handler
+ * show <maps | perms>
+ */
+static void _px_show_handler(const char* params) {
+	static const px_command _commands[] = {
+		{PX_STRL("maps"), _px_show_maps_handler},
+		{NULL, 0, NULL}
+	};
+
+	if (_px_find_cmd(_commands, (char*)params) == 0) {
+		px_error("Command not found!");
+	}
+}
+
+/**
  * Deallocs dynamic memory alloc'ed to the environment data
  */
 static void _px_free_env() {
@@ -95,39 +157,16 @@ static void _px_free_env() {
 }
 
 /**
- * Commands
+ * General commands
  */
-#define PX_STRL(x) x, sizeof(x)-1
 static const px_command commands[] = {
 	{PX_STRL("quit"),   _px_quit_handler  },
 	{PX_STRL("attach"), _px_attach_handler},
 	{PX_STRL("run"),    _px_run_handler   },
 	{PX_STRL("trace"),  _px_trace_handler },
+	{PX_STRL("show"),   _px_show_handler  },
 	{NULL, 0, NULL}
 };
-#undef PX_STRL
-
-/**
- * Handles the command execution
- */
-static void _px_find_cmd(char *cmd) {
-	char *params, *op = strtok_r(cmd, " ", &params);
-	const px_command *cmd_ptr = commands;
-	size_t op_len = op ? strlen(op) : 0;
-
-	if (op) {
-		while (cmd_ptr->cmd) {
-			if (op_len == cmd_ptr->cmd_len
-				&& memcmp(op, cmd_ptr->cmd, cmd_ptr->cmd_len) == 0) {
-				cmd_ptr->handler(params);
-				return;
-			}
-			++cmd_ptr;
-		}
-	}
-
-	px_error("Command not found!\n");
-}
 
 /**
  * Prompt
@@ -155,7 +194,9 @@ void px_prompt() {
 			} else {
 				cmd[cmd_len] = '\0';
 			}
-			_px_find_cmd(cmd);
+			if (_px_find_cmd(commands, cmd) == 0) {
+				px_error("Command not found!\n");
+			}
 		}
 		printf(PX_PROMPT);
 	}

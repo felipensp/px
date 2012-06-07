@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 		{0, 0, 0, 0}
 	};
 
-	printf("px - Process Examinator (" PX_VERSION ")\n");
+	printf("px - Process eXaminator (" PX_VERSION ")\n");
 
 	if (argc > 1) {
 		while ((c = getopt_long(argc, argv, "h", long_opts, &opt_index)) != -1) {
