@@ -120,21 +120,22 @@ static void _px_signal_handler(const char *params) {
  * Dumps all /proc/<pid>/maps information
  */
 static void _px_show_maps_handler(const char *params) {
-	char fname[PATH_MAX], buf[200];
-	int fd, size;
+	char fname[PATH_MAX], *buf = NULL;
+	FILE *fp;
+	size_t size;
 
 	snprintf(fname, sizeof(fname), "/proc/%d/maps", g_env.pid);
 
-	if ((fd = open(fname, O_RDONLY)) == -1) {
+	if ((fp = fopen(fname, "r")) == NULL) {
 		px_error("Fail to open '%s'", fname);
 		return;
 	}
 
-	while ((size = read(fd, buf, sizeof(buf)))) {
-		printf("%.*s", size, buf);
+	while (getline(&buf, &size, fp) != -1) {
+		printf("%.*s", (int)size, buf);
 	}
 
-	close(fd);
+	fclose(fp);
 }
 
 /**
@@ -146,6 +147,11 @@ static void _px_show_handler(const char *params) {
 		{PX_STRL("maps"), _px_show_maps_handler},
 		{NULL, 0, NULL}
 	};
+
+	if (g_env.pid == 0) {
+		px_error("Currently there is no pid attached");
+		return;
+	}
 
 	if (_px_find_cmd(_commands, (char*)params) == 0) {
 		px_error("Command not found!");
