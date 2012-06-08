@@ -160,6 +160,16 @@ static void _px_show_handler(const char *params) {
 	}
 }
 
+static void _px_find_handler(const char *params) {
+	uintptr_t addr = 0;
+
+	sscanf(params, "%lx", &addr);
+
+	if (px_find_region(addr) == 0) {
+		px_error("Address not found!");
+	}
+}
+
 /**
  * General commands
  */
@@ -170,6 +180,7 @@ static const px_command commands[] = {
 	{PX_STRL("signal"), _px_signal_handler},
 	{PX_STRL("maps"),   _px_maps_handler  },
 	{PX_STRL("show"),   _px_show_handler  },
+	{PX_STRL("find"),   _px_find_handler  },
 	{NULL, 0, NULL}
 };
 
