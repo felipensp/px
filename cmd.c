@@ -97,6 +97,8 @@ static void _px_detach_handler(const char *params) {
 	}
 
 	px_detach_pid(g_env.pid);
+
+	g_env.pid = 0;
 }
 
 /**
