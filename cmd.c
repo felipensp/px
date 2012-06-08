@@ -82,19 +82,36 @@ static void _px_attach_handler(const char *params) {
 		return;
 	}
 	g_env.pid = pid;
+
+	px_attach_pid(pid);
 }
 
 /**
- * trace operation handler
- * trace
+ * detach operation handler
+ * detach (implicitly detaches from the last attached pid)
  */
-static void _px_trace_handler(const char *params) {
+static void _px_detach_handler(const char *params) {
 	if (g_env.pid == 0) {
-		px_error("No program information to start tracing "
-				"(use attach/run first)");
+		px_error("Currently there is no pid attached");
 		return;
 	}
-	px_trace_pid(g_env.pid);
+
+	px_detach_pid(g_env.pid);
+}
+
+/**
+ * signal operation handler
+ * signal <number>
+ */
+static void _px_signal_handler(const char *params) {
+	int sig = atoi(params);
+
+	if (g_env.pid == 0) {
+		px_error("Currently there is no pid attached");
+		return;
+	}
+
+	px_send_signal(g_env.pid, sig);
 }
 
 /**
@@ -139,7 +156,8 @@ static void _px_show_handler(const char *params) {
 static const px_command commands[] = {
 	{PX_STRL("quit"),   _px_quit_handler  },
 	{PX_STRL("attach"), _px_attach_handler},
-	{PX_STRL("trace"),  _px_trace_handler },
+	{PX_STRL("detach"), _px_detach_handler},
+	{PX_STRL("signal"), _px_signal_handler},
 	{PX_STRL("show"),   _px_show_handler  },
 	{NULL, 0, NULL}
 };
