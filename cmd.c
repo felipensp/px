@@ -72,22 +72,14 @@ static void _px_quit_handler(const char *params) {
  * attach <pid>
  */
 static void _px_attach_handler(const char *params) {
-	long pid = strtol(params, NULL, 10);
+	pid_t pid = strtol(params, NULL, 10);
 
-	g_env.trace.mode = TRACE_BY_PID;
-	g_env.trace.data.pid = pid;
-}
-
-/**
- * run operation handler
- * run <file> <args>
- */
-static void _px_run_handler(const char *params) {
-	char *args, *proc = strtok_r((char*)params, " ", &args);
-
-	g_env.trace.mode = TRACE_BY_PID;
-	g_env.trace.data.prog[0] = strdup(proc);
-	g_env.trace.data.prog[1] = args ? strdup(args) : NULL;
+	if (pid <= 0) {
+		g_env.pid = 0;
+		px_error("Invalid process id!");
+		return;
+	}
+	g_env.pid = pid;
 }
 
 /**
@@ -95,18 +87,12 @@ static void _px_run_handler(const char *params) {
  * trace
  */
 static void _px_trace_handler(const char *params) {
-	switch (g_env.trace.mode) {
-		case TRACE_NONE:
-			px_error("No program information to start tracing "
-					"(use attach/run first)");
-			break;
-		case TRACE_BY_NAME:
-			px_trace_prog(g_env.trace.data.prog[0], g_env.trace.data.prog[1]);
-			break;
-		case TRACE_BY_PID:
-			px_trace_pid(g_env.trace.data.pid);
-			break;
+	if (g_env.pid == 0) {
+		px_error("No program information to start tracing "
+				"(use attach/run first)");
+		return;
 	}
+	px_trace_pid(g_env.pid);
 }
 
 /**
@@ -116,7 +102,7 @@ static void _px_show_maps_handler(const char *params) {
 	char fname[PATH_MAX], buf[200];
 	int fd, size;
 
-	snprintf(fname, sizeof(fname), "/proc/%d/maps", g_env.trace.data.pid);
+	snprintf(fname, sizeof(fname), "/proc/%d/maps", g_env.pid);
 
 	if ((fd = open(fname, O_RDONLY)) == -1) {
 		px_error("Fail to open '%s'", fname);
@@ -146,23 +132,11 @@ static void _px_show_handler(const char *params) {
 }
 
 /**
- * Deallocs dynamic memory alloc'ed to the environment data
- */
-static void _px_free_env() {
-	if (g_env.trace.mode == TRACE_BY_NAME &&
-		g_env.trace.data.prog[0] != NULL) {
-		px_safe_free(g_env.trace.data.prog[0]);
-		px_safe_free(g_env.trace.data.prog[1]);
-	}
-}
-
-/**
  * General commands
  */
 static const px_command commands[] = {
 	{PX_STRL("quit"),   _px_quit_handler  },
 	{PX_STRL("attach"), _px_attach_handler},
-	{PX_STRL("run"),    _px_run_handler   },
 	{PX_STRL("trace"),  _px_trace_handler },
 	{PX_STRL("show"),   _px_show_handler  },
 	{NULL, 0, NULL}
@@ -200,6 +174,4 @@ void px_prompt() {
 		}
 		printf(PX_PROMPT);
 	}
-
-	_px_free_env();
 }

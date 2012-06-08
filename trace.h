@@ -28,6 +28,5 @@
 #define PX_TRACE
 
 void px_trace_pid(long);
-void px_trace_prog(char*, char*);
 
 #endif /* PX_TRACE */

@@ -28,13 +28,6 @@
 #include "trace.h"
 
 /**
- * Traces an specified program by name
- */
-void px_trace_prog(char *prog, char *args) {
-	printf("[+] Tracing program %s\n", prog);
-}
-
-/**
  * Traces an specified process by pid
  */
 void px_trace_pid(long pid) {

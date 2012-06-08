@@ -36,17 +36,7 @@
 #define PX_MAX_CMD_LEN 100
 
 typedef struct _px_env {
-	struct {
-		enum {
-			TRACE_NONE,
-			TRACE_BY_PID,
-			TRACE_BY_NAME
-		} mode;
-		union {
-			char *prog[2];
-			pid_t pid;
-		} data;
-	} trace;
+	pid_t pid;
 } px_env;
 
 typedef void (*px_command_handler)(const char*);
