@@ -37,7 +37,7 @@ typedef struct _px_maps {
 	char filename[PATH_MAX];
 } px_maps;
 
-void px_maps_region(char *);
+void px_maps_region(const char *);
 int px_maps_find_region(unsigned long);
 void px_maps_clear(void);
 

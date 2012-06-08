@@ -35,7 +35,7 @@
 /**
  * Parses an line from /proc/<pid>/maps
  */
-void px_maps_region(char *line) {
+void px_maps_region(const char *line) {
 	uintptr_t start, end;
 	char perms[5], filename[PATH_MAX];
 	int offset, dmajor, dminor, inode;
@@ -46,9 +46,7 @@ void px_maps_region(char *line) {
 		return;
 	}
 
-	if (g_env.maps == NULL) {
-		g_env.maps = malloc(sizeof(px_maps) * 5);
-	} else if (g_env.nregions % 5 == 0) {
+	if (g_env.maps == NULL || g_env.nregions % 5 == 0) {
 		g_env.maps = realloc(g_env.maps, sizeof(px_maps) * (g_env.nregions + 5));
 	}
 
