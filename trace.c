@@ -31,21 +31,22 @@
 #include <string.h>
 #include "common.h"
 #include "trace.h"
+#include "cmd.h"
 
 /**
  * Attaches to an specified pid
  */
-void px_attach_pid(long pid) {
+void px_attach_pid(void) {
 	int stat;
 
-	printf("[+] Attaching to pid %ld\n", pid);
+	printf("[+] Attaching to pid %d\n", g_env.pid);
 
-	if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) == -1) {
+	if (ptrace(PTRACE_ATTACH, g_env.pid, NULL, NULL) == -1) {
 		px_error("Failed to attach to pid (%s)", strerror(errno));
 		return;
 	}
 
-	if (waitpid(pid, &stat, WNOHANG) != pid || !WIFSTOPPED(stat)) {
+	if (waitpid(g_env.pid, &stat, WNOHANG) != g_env.pid || !WIFSTOPPED(stat)) {
 		px_error("Unexpected wait result (%s)", strerror(errno));
 	}
 }
@@ -53,13 +54,15 @@ void px_attach_pid(long pid) {
 /**
  * Detaches from an previously attached pid
  */
-void px_detach_pid(long pid) {
-	printf("[+] Detaching from pid %ld\n", pid);
+void px_detach_pid(void) {
+	printf("[+] Detaching from pid %d\n", g_env.pid);
 
-	if (ptrace(PTRACE_DETACH, pid, NULL, NULL) == -1) {
+	if (ptrace(PTRACE_DETACH, g_env.pid, NULL, NULL) == -1) {
 		px_error("Failed to detach from pid (%s)", strerror(errno));
 		return;
 	}
+
+	g_env.pid = 0;
 }
 
 /**
@@ -80,6 +83,8 @@ void px_send_signal(pid_t pid, int sig) {
 	if (WIFEXITED(stat)) {
 		printf("Child status: %d (Exited with status: %d)\n",
 			stat, WEXITSTATUS(stat));
+
+		g_env.pid = 0;
 	} else {
 		printf("Child status: %d\n", stat);
 	}

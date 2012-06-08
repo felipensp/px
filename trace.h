@@ -27,8 +27,8 @@
 #ifndef PX_TRACE
 #define PX_TRACE
 
-void px_attach_pid(long);
-void px_detach_pid(long);
+void px_attach_pid();
+void px_detach_pid();
 void px_send_signal(pid_t, int);
 
 #endif /* PX_TRACE */

@@ -63,9 +63,26 @@ static int _px_find_cmd(const px_command *cmd_list, char *cmd) {
 }
 
 /**
+ * Clears information about current session
+ */
+static void _px_clear_session() {
+	if (g_env.maps != NULL) {
+		px_maps_clear();
+	}
+
+	if (g_env.pid != 0) {
+		px_detach_pid();
+	}
+}
+
+/**
  * quit operation handler
  */
 static void _px_quit_handler(const char *params) {
+	if (g_env.pid != 0) {
+		_px_clear_session();
+	}
+
 	printf("quit!\n");
 	exit(0);
 }
@@ -76,6 +93,10 @@ static void _px_quit_handler(const char *params) {
  */
 static void _px_attach_handler(const char *params) {
 	pid_t pid = strtol(params, NULL, 10);
+
+	if (g_env.pid != 0) {
+		_px_clear_session();
+	}
 
 	if (kill(pid, 0) == -1) {
 		g_env.pid = 0;
@@ -98,6 +119,8 @@ static void _px_detach_handler(const char *params) {
 	}
 
 	px_detach_pid(g_env.pid);
+
+	_px_clear_session();
 
 	g_env.pid = 0;
 }
@@ -133,7 +156,7 @@ static void _px_maps_handler(const char *params) {
 	}
 
 	while (getline(&line, &size, fp) != -1) {
-		px_mapping(line);
+		px_maps_region(line);
 	}
 
 	printf("%d mapped regions\n", (int)g_env.nregions);
@@ -160,12 +183,16 @@ static void _px_show_handler(const char *params) {
 	}
 }
 
+/**
+ * Finds an specified address in the mapped regions
+ * find <address>
+ */
 static void _px_find_handler(const char *params) {
 	uintptr_t addr = 0;
 
 	sscanf(params, "%lx", &addr);
 
-	if (px_find_region(addr) == 0) {
+	if (px_maps_find_region(addr) == 0) {
 		px_error("Address not found!");
 	}
 }
