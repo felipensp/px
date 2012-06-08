@@ -36,6 +36,8 @@
 #define PX_PROMPT "px!> "
 #define PX_MAX_CMD_LEN 100
 
+#define ENV(x) g_env.x
+
 typedef struct _px_env {
 	pid_t pid;
 	size_t nregions;

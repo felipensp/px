@@ -66,11 +66,11 @@ static int _px_find_cmd(const px_command *cmd_list, char *cmd) {
  * Clears information about current session
  */
 static void _px_clear_session() {
-	if (g_env.maps != NULL) {
+	if (ENV(maps) != NULL) {
 		px_maps_clear();
 	}
 
-	if (g_env.pid != 0) {
+	if (ENV(pid) != 0) {
 		px_detach_pid();
 	}
 }
@@ -79,7 +79,7 @@ static void _px_clear_session() {
  * quit operation handler
  */
 static void _px_quit_handler(const char *params) {
-	if (g_env.pid != 0) {
+	if (ENV(pid) != 0) {
 		_px_clear_session();
 	}
 
@@ -94,16 +94,16 @@ static void _px_quit_handler(const char *params) {
 static void _px_attach_handler(const char *params) {
 	pid_t pid = strtol(params, NULL, 10);
 
-	if (g_env.pid != 0) {
+	if (ENV(pid) != 0) {
 		_px_clear_session();
 	}
 
 	if (kill(pid, 0) == -1) {
-		g_env.pid = 0;
+		ENV(pid) = 0;
 		px_error("Invalid process id `%d' (%s)", pid, strerror(errno));
 		return;
 	}
-	g_env.pid = pid;
+	ENV(pid) = pid;
 
 	px_attach_pid(pid);
 }
@@ -113,16 +113,16 @@ static void _px_attach_handler(const char *params) {
  * detach (implicitly detaches from the last attached pid)
  */
 static void _px_detach_handler(const char *params) {
-	if (g_env.pid == 0) {
+	if (ENV(pid) == 0) {
 		px_error("Currently there is no pid attached");
 		return;
 	}
 
-	px_detach_pid(g_env.pid);
+	px_detach_pid(ENV(pid));
 
 	_px_clear_session();
 
-	g_env.pid = 0;
+	ENV(pid) = 0;
 }
 
 /**
@@ -130,14 +130,14 @@ static void _px_detach_handler(const char *params) {
  * signal <number>
  */
 static void _px_signal_handler(const char *params) {
-	int sig = atoi(params);
+	int signum = atoi(params);
 
-	if (g_env.pid == 0) {
+	if (ENV(pid) == 0) {
 		px_error("Currently there is no pid attached");
 		return;
 	}
 
-	px_send_signal(g_env.pid, sig);
+	px_send_signal(signum);
 }
 
 /**
@@ -148,7 +148,7 @@ static void _px_maps_handler(const char *params) {
 	FILE *fp;
 	size_t size;
 
-	snprintf(fname, sizeof(fname), "/proc/%d/maps", g_env.pid);
+	snprintf(fname, sizeof(fname), "/proc/%d/maps", ENV(pid));
 
 	if ((fp = fopen(fname, "r")) == NULL) {
 		px_error("Fail to open '%s'", fname);
@@ -159,7 +159,7 @@ static void _px_maps_handler(const char *params) {
 		px_maps_region(line);
 	}
 
-	printf("%d mapped regions\n", (int)g_env.nregions);
+	printf("%d mapped regions\n", (int)ENV(nregions));
 
 	fclose(fp);
 }
@@ -173,7 +173,7 @@ static void _px_show_handler(const char *params) {
 		{NULL, 0, NULL}
 	};
 
-	if (g_env.pid == 0) {
+	if (ENV(pid) == 0) {
 		px_error("Currently there is no pid attached");
 		return;
 	}

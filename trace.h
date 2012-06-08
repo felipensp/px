@@ -29,6 +29,6 @@
 
 void px_attach_pid();
 void px_detach_pid();
-void px_send_signal(pid_t, int);
+void px_send_signal(int);
 
 #endif /* PX_TRACE */

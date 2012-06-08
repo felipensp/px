@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <limits.h>
+#include "common.h"
 #include "maps.h"
 #include "cmd.h"
 
@@ -39,6 +40,7 @@ void px_maps_region(const char *line) {
 	uintptr_t start, end;
 	char perms[5], filename[PATH_MAX];
 	int offset, dmajor, dminor, inode;
+	size_t n = ENV(nregions);
 
 	if (sscanf(line, "%lx-%lx %s %x %x:%x %u %s",
 		&start, &end, perms, &offset, &dmajor, &dminor, &inode, filename) < 6 ||
@@ -46,16 +48,21 @@ void px_maps_region(const char *line) {
 		return;
 	}
 
-	if (g_env.maps == NULL || g_env.nregions % 5 == 0) {
-		g_env.maps = realloc(g_env.maps, sizeof(px_maps) * (g_env.nregions + 5));
+	if (ENV(maps) == NULL || n % 5 == 0) {
+		ENV(maps) = (px_maps*) realloc(ENV(maps), sizeof(px_maps) * (n + 5));
+
+		if (ENV(maps) == NULL) {
+			px_error("Failed to realloc!\n");
+			return;
+		}
 	}
 
-	g_env.maps[g_env.nregions].start = start;
-	g_env.maps[g_env.nregions].end = end;
-	memcpy(g_env.maps[g_env.nregions].filename, filename, sizeof(filename));
-	memcpy(g_env.maps[g_env.nregions].perms, perms, sizeof(perms));
+	ENV(maps)[n].start = start;
+	ENV(maps)[n].end = end;
+	memcpy(ENV(maps)[n].filename, filename, sizeof(filename));
+	memcpy(ENV(maps)[n].perms, perms, sizeof(perms));
 
-	++g_env.nregions;
+	++ENV(nregions);
 }
 
 /**
@@ -64,10 +71,10 @@ void px_maps_region(const char *line) {
 int px_maps_find_region(uintptr_t addr) {
 	int i = 0;
 
-	while (i < g_env.nregions) {
-		if (g_env.maps[i].start <= addr && g_env.maps[i].end >= addr) {
+	while (i < ENV(nregions)) {
+		if (ENV(maps)[i].start <= addr && ENV(maps)[i].end >= addr) {
 			printf("Found... %s (%s)\n",
-				g_env.maps[i].filename, g_env.maps[i].perms);
+				ENV(maps)[i].filename, ENV(maps)[i].perms);
 			return 1;
 		}
 		++i;
@@ -79,9 +86,9 @@ int px_maps_find_region(uintptr_t addr) {
  * Deallocs memory used to the mapped regions
  */
 void px_maps_clear(void) {
-	if (g_env.maps != NULL) {
-		free(g_env.maps);
-		g_env.maps = NULL;
+	if (ENV(maps) != NULL) {
+		free(ENV(maps));
+		ENV(maps) = NULL;
 	}
-	g_env.nregions = 0;
+	ENV(nregions) = 0;
 }
