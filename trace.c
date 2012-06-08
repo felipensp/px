@@ -68,6 +68,8 @@ void px_detach_pid(long pid) {
 void px_send_signal(pid_t pid, int sig) {
 	int stat;
 
+	printf("[+] Sending signal %d to attached process\n", sig);
+
 	if (kill(pid, sig) == -1) {
 		px_error("%s", strerror(errno));
 		return;
