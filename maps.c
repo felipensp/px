@@ -37,7 +37,7 @@
  */
 void px_maps_region(char *line) {
 	uintptr_t start, end;
-	char perms[4], filename[PATH_MAX];
+	char perms[5], filename[PATH_MAX];
 	int offset, dmajor, dminor, inode;
 
 	if (sscanf(line, "%lx-%lx %s %x %x:%x %u %s",
