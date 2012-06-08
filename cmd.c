@@ -35,6 +35,7 @@
 #include "common.h"
 #include "cmd.h"
 #include "trace.h"
+#include "maps.h"
 
 px_env g_env;
 
@@ -117,10 +118,10 @@ static void _px_signal_handler(const char *params) {
 }
 
 /**
- * Dumps all /proc/<pid>/maps information
+ * Maps the memory using the /proc/<pid>/maps information
  */
-static void _px_show_maps_handler(const char *params) {
-	char fname[PATH_MAX], *buf = NULL;
+static void _px_maps_handler(const char *params) {
+	char fname[PATH_MAX], *line = NULL;
 	FILE *fp;
 	size_t size;
 
@@ -131,9 +132,11 @@ static void _px_show_maps_handler(const char *params) {
 		return;
 	}
 
-	while (getline(&buf, &size, fp) != -1) {
-		printf("%.*s", (int)size, buf);
+	while (getline(&line, &size, fp) != -1) {
+		px_mapping(line);
 	}
+
+	printf("%d mapped regions\n", (int)g_env.nregions);
 
 	fclose(fp);
 }
@@ -144,7 +147,6 @@ static void _px_show_maps_handler(const char *params) {
  */
 static void _px_show_handler(const char *params) {
 	static const px_command _commands[] = {
-		{PX_STRL("maps"), _px_show_maps_handler},
 		{NULL, 0, NULL}
 	};
 
@@ -166,6 +168,7 @@ static const px_command commands[] = {
 	{PX_STRL("attach"), _px_attach_handler},
 	{PX_STRL("detach"), _px_detach_handler},
 	{PX_STRL("signal"), _px_signal_handler},
+	{PX_STRL("maps"),   _px_maps_handler  },
 	{PX_STRL("show"),   _px_show_handler  },
 	{NULL, 0, NULL}
 };

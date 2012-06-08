@@ -28,6 +28,7 @@
 #define PX_CMD
 
 #include <sys/types.h>
+#include "maps.h"
 
 /**
  * Prompt settings
@@ -37,6 +38,8 @@
 
 typedef struct _px_env {
 	pid_t pid;
+	size_t nregions;
+	px_maps *maps;
 } px_env;
 
 typedef void (*px_command_handler)(const char*);
