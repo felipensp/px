@@ -27,6 +27,7 @@
 #ifndef PX_MAPS
 #define PX_MAPS
 
+#include <link.h>
 #include <stdint.h>
 #include <limits.h>
 
@@ -40,6 +41,7 @@ typedef struct _px_maps {
 void px_maps_region(const char *);
 int px_maps_find_region(unsigned long);
 void px_maps_elf(const char*);
+int px_maps_find_symbol(const char*);
 void px_maps_clear(void);
 
 #endif /* PX_MAPS */

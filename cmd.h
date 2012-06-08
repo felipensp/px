@@ -41,10 +41,15 @@
 
 typedef struct _px_env {
 	pid_t pid;
-	uintptr_t saddr;
+	struct {
+		uintptr_t saddr;  /* start address */
+		uintptr_t got;    /* GOT address */
+		uintptr_t strtab; /* strtab address */
+		uintptr_t symtab; /* symtab address */
+		uintptr_t map;    /* link_map address */
+	} elf;
 	size_t nregions;
 	px_maps *maps;
-	ElfW(Word) *got;
 } px_env;
 
 typedef void (*px_command_handler)(const char*);
