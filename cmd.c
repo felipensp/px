@@ -144,11 +144,13 @@ static void _px_signal_handler(const char *params) {
  * Maps the memory using the /proc/<pid>/maps information
  */
 static void _px_maps_handler(const char *params) {
-	char fname[PATH_MAX], *line = NULL;
+	char fname[PATH_MAX], lname[PATH_MAX], *line = NULL;
 	FILE *fp;
 	size_t size;
 
 	snprintf(fname, sizeof(fname), "/proc/%d/maps", ENV(pid));
+
+	printf("[+] Starting to read %s...\n", fname);
 
 	if ((fp = fopen(fname, "r")) == NULL) {
 		px_error("Fail to open '%s'", fname);
@@ -160,6 +162,16 @@ static void _px_maps_handler(const char *params) {
 	}
 
 	printf("%d mapped regions\n", (int)ENV(nregions));
+
+	snprintf(fname, sizeof(fname), "/proc/%d/exe", ENV(pid));
+
+	printf("[+] Starting to read ELF...\n");
+
+	if (readlink(fname, lname, sizeof(lname)) == -1) {
+		px_error("readlink failed! (%s)\n", strerror(errno));
+	} else {
+		px_maps_elf(lname);
+	}
 
 	fclose(fp);
 }

@@ -25,6 +25,11 @@
  */
 
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -32,6 +37,7 @@
 #include "common.h"
 #include "maps.h"
 #include "cmd.h"
+#include "ptrace.h"
 
 /**
  * Parses an line from /proc/<pid>/maps
@@ -40,7 +46,7 @@ void px_maps_region(const char *line) {
 	uintptr_t start, end;
 	char perms[5], filename[PATH_MAX];
 	int offset, dmajor, dminor, inode;
-	size_t n = ENV(nregions);
+	const size_t n = ENV(nregions);
 
 	if (sscanf(line, "%lx-%lx %s %x %x:%x %u %s",
 		&start, &end, perms, &offset, &dmajor, &dminor, &inode, filename) < 6 ||
@@ -62,6 +68,9 @@ void px_maps_region(const char *line) {
 	memcpy(ENV(maps)[n].filename, filename, sizeof(filename));
 	memcpy(ENV(maps)[n].perms, perms, sizeof(perms));
 
+	/* Sets the start address where the read ELF data will be read */
+	ENV(saddr) = ENV(maps)[0].start;
+
 	++ENV(nregions);
 }
 
@@ -80,6 +89,14 @@ int px_maps_find_region(uintptr_t addr) {
 		++i;
 	}
 	return 0;
+}
+
+void px_maps_elf(const char *file) {
+	ElfW(Ehdr) header;
+
+	ptrace_read(ENV(saddr), &header, sizeof(ElfW(Ehdr)));
+
+	printf("Program header at %#lx\n", ENV(saddr) + header.e_phoff);
 }
 
 /**

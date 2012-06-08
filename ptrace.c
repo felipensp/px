@@ -24,39 +24,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PX_CMD
-#define PX_CMD
-
-#include <sys/types.h>
-#include <link.h>
-#include "maps.h"
+#include <sys/ptrace.h>
+#include <string.h>
+#include "ptrace.h"
+#include "cmd.h"
 
 /**
- * Prompt settings
+ * Reads memory from the child process
  */
-#define PX_PROMPT "px!> "
-#define PX_MAX_CMD_LEN 100
+void ptrace_read(uintptr_t addr, void *vptr, size_t len) {
+	const size_t long_size = sizeof(long);
+	int i = 0, j = len / long_size, is_exact = len % long_size;
+	long word;
+	void *saddr = vptr;
 
-#define ENV(x) g_env.x
-
-typedef struct _px_env {
-	pid_t pid;
-	uintptr_t saddr;
-	size_t nregions;
-	px_maps *maps;
-	ElfW(Word) *got;
-} px_env;
-
-typedef void (*px_command_handler)(const char*);
-
-typedef struct _px_command {
-	const char *cmd;
-	size_t cmd_len;
-	px_command_handler handler;
-} px_command;
-
-void px_prompt();
-
-extern px_env g_env;
-
-#endif /* PX_CMD */
+	while (i <= j) {
+		if (i == j && is_exact == 0) {
+			break;
+		}
+		word = ptrace(PTRACE_PEEKTEXT, ENV(pid), addr + i * long_size, NULL);
+		memcpy(saddr, &word, i == j ? (len % long_size) : long_size);
+		saddr += long_size;
+		++i;
+	}
+}
