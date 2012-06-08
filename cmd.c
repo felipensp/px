@@ -29,6 +29,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
 #include <limits.h>
 #include "common.h"
 #include "cmd.h"
@@ -74,9 +76,9 @@ static void _px_quit_handler(const char *params) {
 static void _px_attach_handler(const char *params) {
 	pid_t pid = strtol(params, NULL, 10);
 
-	if (pid <= 0) {
+	if (kill(pid, 0) == -1) {
 		g_env.pid = 0;
-		px_error("Invalid process id!");
+		px_error("Invalid process id `%d' (%s)", pid, strerror(errno));
 		return;
 	}
 	g_env.pid = pid;
