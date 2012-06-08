@@ -37,28 +37,29 @@
 static void usage() {
 	printf("Usage: px [options]\n\n"
 			"Options:\n"
-			"	-h, --help	Displays this information\n");
+			"	-h, --help	Displays this information\n"
+			"	-v, --version	Displays the version\n");
 }
 
 int main(int argc, char **argv) {
 	char c;
 	int opt_index = 0;
 	static struct option long_opts[] = {
-		{"help", no_argument, 0, 'h'},
+		{"help",    no_argument, 0, 'h'},
+		{"version", no_argument, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
-	printf("px - Process eXaminator (" PX_VERSION ")\n");
-
-	if (argc > 1) {
-		while ((c = getopt_long(argc, argv, "h", long_opts, &opt_index)) != -1) {
-			switch (c) {
-				case 'h':
-					usage();
-					exit(0);
-				case '?':
-					break;
-			}
+	while ((c = getopt_long(argc, argv, "hv", long_opts, &opt_index)) != -1) {
+		switch (c) {
+			case 'h':
+				usage();
+				exit(0);
+			case 'v':
+				printf("px-" PX_VERSION "\n");
+				exit(0);
+			case '?':
+				exit(1);
 		}
 	}
 
