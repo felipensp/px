@@ -38,11 +38,10 @@
 void px_maps_region(char *line) {
 	uintptr_t start, end;
 	char perms[4], filename[PATH_MAX];
-	int offset, dev_major, dev_minor, inode;
+	int offset, dmajor, dminor, inode;
 
 	if (sscanf(line, "%lx-%lx %s %x %x:%x %u %s",
-		&start, &end, perms, &offset,
-			&dev_major, &dev_minor, &inode, filename) < 6 ||
+		&start, &end, perms, &offset, &dmajor, &dminor, &inode, filename) < 6 ||
 		(end - start) == 0) {
 		return;
 	}
