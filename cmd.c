@@ -36,6 +36,7 @@
 #include "cmd.h"
 #include "trace.h"
 #include "maps.h"
+#include "elf.h"
 
 px_env g_env;
 
@@ -170,7 +171,7 @@ static void _px_maps_handler(const char *params) {
 	if (readlink(fname, lname, sizeof(lname)) == -1) {
 		px_error("readlink failed! (%s)\n", strerror(errno));
 	} else {
-		px_maps_elf(lname);
+		px_elf_maps();
 	}
 
 	fclose(fp);

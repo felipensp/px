@@ -24,44 +24,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PX_CMD
-#define PX_CMD
+#ifndef PX_ELF
+#define PX_ELF
 
-#include <sys/types.h>
-#include <link.h>
-#include "maps.h"
+#define ELF(x) ENV(elf.x)
 
-/**
- * Prompt settings
- */
-#define PX_PROMPT "px!> "
-#define PX_MAX_CMD_LEN 100
+void px_elf_maps(void);
+int px_elf_find_symbol(const char*);
 
-#define ENV(x) g_env.x
-
-typedef struct _px_env {
-	pid_t pid;            /* target process pid */
-	struct {
-		uintptr_t saddr;  /* start address */
-		uintptr_t got;    /* GOT address */
-		uintptr_t strtab; /* strtab address */
-		uintptr_t symtab; /* symtab address */
-		uintptr_t map;    /* link_map address */
-	} elf;
-	size_t nregions;      /* number of mapped regions */
-	px_maps *maps;        /* mapped regions from /proc/pid/maps */
-} px_env;
-
-typedef void (*px_command_handler)(const char*);
-
-typedef struct _px_command {
-	const char *cmd;
-	size_t cmd_len;
-	px_command_handler handler;
-} px_command;
-
-void px_prompt();
-
-extern px_env g_env;
-
-#endif /* PX_CMD */
+#endif /* PX_ELF */
