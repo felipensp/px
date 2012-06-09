@@ -38,7 +38,7 @@
 static int _px_elf_resolv_tables(struct link_map *map) {
 	ElfW(Dyn) dyn;
 	uintptr_t addr = (uintptr_t) map->l_ld;
-	int nchains;
+	ElfW(Word) nchains;
 
 	do {
 		ptrace_read(addr, &dyn, sizeof(dyn));
@@ -49,7 +49,7 @@ static int _px_elf_resolv_tables(struct link_map *map) {
 
 		switch (dyn.d_tag) {
 			case DT_HASH:
-				ptrace_read(dyn.d_un.d_ptr + map->l_addr + sizeof(void*),
+				ptrace_read(dyn.d_un.d_ptr + map->l_addr,
 					&nchains, sizeof(nchains));
 				break;
 			case DT_STRTAB:
