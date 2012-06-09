@@ -137,16 +137,18 @@ int _px_maps_resolv_tables(struct link_map *map) {
 int px_maps_find_symbol(const char* name) {
 	struct link_map map;
 	ElfW(Sym) sym;
-	char str[128];
-	char libname[256];
-	int i = 0, nchains, found = 0;
+	char str[128], libname[PATH_MAX];
+	int i = 0, nchains;
 
 	ptrace_read(ELF(map), &map, sizeof(map));
 
 	do {
+		ptrace_read((uintptr_t)map.l_next, &map, sizeof(map));
 		ptrace_read((uintptr_t)map.l_name, libname, sizeof(libname));
 
 		nchains = _px_maps_resolv_tables(&map);
+
+		printf("Library %s (chains=%d)\n", libname, nchains);
 		i = 0;
 
 		while (i < nchains) {
@@ -160,15 +162,13 @@ int px_maps_find_symbol(const char* name) {
 
 			ptrace_read(ELF(strtab) + sym.st_name, str, sizeof(str));
 
-			printf("[%s]\n", str);
+			printf("%d [%s]\n", ELF_ST_TYPE(sym.st_info), str);
 
 			if (memcmp(str, name, strlen(name)) == 0) {
 				return 1;
 			}
 		}
-
-		ptrace_read((uintptr_t)map.l_next, &map, sizeof(map));
-	} while (found == 0 && map.l_next);
+	} while (map.l_next);
 
 	return 0;
 }
