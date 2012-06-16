@@ -160,10 +160,47 @@ void px_elf_maps(void) {
  */
 void px_elf_dump_sections(void) {
 	ElfW(Ehdr) header;
+	ElfW(Shdr) section;
+	const char *name;
+	uintptr_t sections;
+	int i;
 
 	ptrace_read(ELF(header), &header, sizeof(header));
 
-	printf("sections = %d\n", header.e_shnum);
+	sections = ELF(header) + header.e_shoff;
+
+	printf("Nr  | Type     | Flags | VAddr\n");
+
+	for (i = 0; i < header.e_shnum; ++i) {
+		ptrace_read(sections + (i * sizeof(section)), &section, sizeof(section));
+
+		switch (section.sh_type) {
+			case SHT_SYMTAB:   name = "SYMTAB";   break;
+			case SHT_STRTAB:   name = "STRTAB";   break;
+			case SHT_HASH:     name = "HASH";     break;
+			case SHT_DYNAMIC:  name = "DYNAMIC";  break;
+            case SHT_NOTE:     name = "NOTE";     break;
+			case SHT_NULL:     name = "NULL";     break;
+			case SHT_PROGBITS: name = "PROGBITS"; break;
+			case SHT_NOBITS:   name = "NOBITS";   break;
+			case SHT_REL:      name = "REL";      break;
+			case SHT_SHLIB:    name = "SHLIB";    break;
+			case SHT_DYNSYM:   name = "DYNSYM";   break;
+			case SHT_LOPROC:   name = "LOPROC";   break;
+			case SHT_HIPROC:   name = "HIPROC";   break;
+			case SHT_LOUSER:   name = "LOUSER";   break;
+			case SHT_HIUSER:   name = "HIUSER";   break;
+			default:           name = "UNKNOWN";  break;
+		}
+		printf(" %-2d | %-8s | %c%c%c   | %#lx\n", i, name,
+			section.sh_flags & SHF_ALLOC     ? 'A' : '-',
+			section.sh_flags & SHF_WRITE     ? 'W' : '-',
+			section.sh_flags & SHF_EXECINSTR ? 'X' : '-',
+			section.sh_addr
+			);
+	}
+
+	printf("Number of sections: %d\n", header.e_shnum);
 }
 
 /**
