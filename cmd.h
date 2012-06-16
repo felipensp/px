@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <link.h>
 #include "maps.h"
+#include "elf.h"
 
 /**
  * Command handler args
@@ -46,13 +47,7 @@
 
 typedef struct _px_env {
 	pid_t pid;            /* target process pid */
-	struct {
-		uintptr_t header; /* start address */
-		uintptr_t got;    /* GOT address */
-		uintptr_t strtab; /* strtab address */
-		uintptr_t symtab; /* symtab address */
-		uintptr_t map;    /* link_map address */
-	} elf;
+	px_elf elf;
 	size_t nregions;      /* number of mapped regions */
 	px_maps *maps;        /* mapped regions from /proc/pid/maps */
 } px_env;

@@ -27,6 +27,20 @@
 #ifndef PX_ELF
 #define PX_ELF
 
+/**
+ * ELF information
+ */
+typedef struct _px_elf {
+	uintptr_t header; /* start address */
+	uintptr_t got;    /* GOT address */
+	uintptr_t strtab; /* strtab address */
+	uintptr_t symtab; /* symtab address */
+	uintptr_t map;    /* link_map address */
+} px_elf;
+
+/**
+ * Helper macro to access ELF information in the g_env global var
+ */
 #define ELF(x) ENV(elf.x)
 
 void px_elf_maps(void);

@@ -165,6 +165,5 @@ void px_elf_dump_sections(void) {
  * Clears the ELF related data
  */
 void px_elf_clear(void) {
-	ELF(header) = 0;
-	ELF(got) = 0;
+	memset(&ENV(elf), 0, sizeof(ENV(elf)));
 }
