@@ -32,7 +32,6 @@
 #include "maps.h"
 #include "cmd.h"
 #include "ptrace.h"
-#include "elf.h"
 
 /**
  * Parses an line from /proc/<pid>/maps
@@ -95,6 +94,4 @@ void px_maps_clear(void) {
 		ENV(maps) = NULL;
 	}
 	ENV(nregions) = 0;
-
-	px_elf_clear();
 }

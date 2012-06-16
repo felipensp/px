@@ -80,6 +80,7 @@ static int _px_find_cmd(const px_command *cmd_list, char *cmd, int split) {
 static void _px_clear_session() {
 	if (ENV(maps) != NULL) {
 		px_maps_clear();
+		px_elf_clear();
 	}
 
 	if (ENV(pid) != 0) {

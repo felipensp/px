@@ -197,8 +197,7 @@ void px_elf_dump_sections(void) {
 			section.sh_flags & SHF_ALLOC     ? 'A' : '-',
 			section.sh_flags & SHF_WRITE     ? 'W' : '-',
 			section.sh_flags & SHF_EXECINSTR ? 'X' : '-',
-			section.sh_addr
-			);
+			section.sh_addr);
 	}
 
 	printf("Number of sections: %d\n", header.e_shnum);
