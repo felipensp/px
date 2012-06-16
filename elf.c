@@ -167,6 +167,7 @@ void px_elf_dump_sections(void) {
 
 	ptrace_read(ELF(header), &header, sizeof(header));
 
+	/* Section table offset */
 	sections = ELF(header) + header.e_shoff;
 
 	printf("Nr  | Type     | Flags | VAddr\n");
@@ -201,6 +202,47 @@ void px_elf_dump_sections(void) {
 	}
 
 	printf("Number of sections: %d\n", header.e_shnum);
+}
+
+/**
+ * Dumps ELF program headers
+ */
+void px_elf_dump_pheaders(void) {
+	ElfW(Ehdr) header;
+	ElfW(Phdr) pheader;
+	uintptr_t pheaders;
+	const char *name;
+	int i;
+
+	ptrace_read(ELF(header), &header, sizeof(header));
+
+	/* Program header table offset */
+	pheaders = ELF(header) + header.e_phoff;
+
+	printf("Type     | Size     | Flags | Vaddr\n");
+
+	for (i = 0; i < header.e_phnum; ++i) {
+		ptrace_read(pheaders + (i * sizeof(pheader)), &pheader, sizeof(pheader));
+
+		switch (pheader.p_type) {
+			case PT_NULL:    name = "NULL";    break;
+			case PT_LOAD:    name = "LOAD";    break;
+			case PT_DYNAMIC: name = "DYNAMIC"; break;
+			case PT_INTERP:  name = "INTERP";  break;
+			case PT_NOTE:    name = "NOTE";    break;
+			case PT_SHLIB:   name = "SHLIB";   break;
+			case PT_PHDR:    name = "PHDR";    break;
+			case PT_LOPROC:  name = "LOPROC";  break;
+			case PT_HIPROC:  name = "HIPROC";  break;
+			default:         name = "UNKNOWN"; break;
+		}
+
+		printf("%-8s | %-8ld | %c%c%c   | %#lx\n", name, pheader.p_filesz,
+			pheader.p_flags & (1<<0) ? 'X' : '-',
+			pheader.p_flags & (1<<1) ? 'W' : '-',
+			pheader.p_flags & (1<<2) ? 'R' : '-',
+			pheader.p_vaddr);
+	}
 }
 
 /**

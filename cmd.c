@@ -56,8 +56,8 @@ inline static int _px_check_pid(void) {
 /**
  * Finds and call a handler if found
  */
-static int _px_find_cmd(const px_command *cmd_list, char *cmd) {
-	char *params, *op = strtok_r(cmd, " ", &params);
+static int _px_find_cmd(const px_command *cmd_list, char *cmd, int split) {
+	char *params = NULL, *op = split ? strtok_r(cmd, " ", &params) : cmd;
 	const px_command *cmd_ptr = cmd_list;
 	size_t op_len = op ? strlen(op) : 0;
 
@@ -194,8 +194,16 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
 	if (_px_check_pid()) {
 		return;
 	}
-	
+
 	px_elf_dump_sections();
+}
+
+static void _px_show_pheaders_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
+		return;
+	}
+
+	px_elf_dump_pheaders();
 }
 
 /**
@@ -204,7 +212,8 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
  */
 static void _px_show_handler(CMD_HANDLER_ARGS) {
 	static const px_command _commands[] = {
-		{PX_STRL("sections"), _px_show_sections_handler},
+		{PX_STRL("sections"),        _px_show_sections_handler},
+		{PX_STRL("program headers"), _px_show_pheaders_handler},
 		{NULL, 0, NULL}
 	};
 
@@ -212,7 +221,7 @@ static void _px_show_handler(CMD_HANDLER_ARGS) {
 		return;
 	}
 
-	if (_px_find_cmd(_commands, (char*)params) == 0) {
+	if (_px_find_cmd(_commands, (char*)params, 0) == 0) {
 		px_error("Command not found!");
 	}
 }
@@ -271,7 +280,7 @@ void px_prompt() {
 			} else {
 				cmd[cmd_len] = '\0';
 			}
-			if (_px_find_cmd(commands, cmd) == 0) {
+			if (_px_find_cmd(commands, cmd, 1) == 0) {
 				px_error("Command not found!\n");
 			}
 		}
