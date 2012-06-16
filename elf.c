@@ -238,9 +238,9 @@ void px_elf_dump_pheaders(void) {
 		}
 
 		printf("%-8s | %-8ld | %c%c%c   | %#lx\n", name, pheader.p_filesz,
-			pheader.p_flags & (1<<0) ? 'X' : '-',
-			pheader.p_flags & (1<<1) ? 'W' : '-',
-			pheader.p_flags & (1<<2) ? 'R' : '-',
+			pheader.p_flags & PF_X ? 'X' : '-',
+			pheader.p_flags & PF_W ? 'W' : '-',
+			pheader.p_flags & PF_R ? 'R' : '-',
 			pheader.p_vaddr);
 	}
 }
