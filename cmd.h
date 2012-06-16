@@ -52,7 +52,7 @@ typedef struct _px_env {
 	px_maps *maps;        /* mapped regions from /proc/pid/maps */
 } px_env;
 
-typedef void (*px_command_handler)(const char*);
+typedef void (*px_command_handler)(CMD_HANDLER_ARGS);
 
 typedef struct _px_command {
 	const char *cmd;
