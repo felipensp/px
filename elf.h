@@ -31,7 +31,7 @@
  * ELF information
  */
 typedef struct _px_elf {
-	uintptr_t header; /* start address */
+	uintptr_t header; /* base address */
 	uintptr_t got;    /* GOT address */
 	uintptr_t strtab; /* strtab address */
 	uintptr_t symtab; /* symtab address */
