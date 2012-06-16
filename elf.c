@@ -159,6 +159,11 @@ void px_elf_maps(void) {
  * Dumps the ELF sections
  */
 void px_elf_dump_sections(void) {
+	ElfW(Ehdr) header;
+	
+	ptrace_read(ELF(header), &header, sizeof(header));
+	
+	printf("sections = %d\n", header.e_shnum);
 }
 
 /**

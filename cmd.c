@@ -48,9 +48,9 @@ px_env g_env;
 inline static int _px_check_pid(void) {
 	if (ENV(pid) == 0) {
 		px_error("Currently there is no pid attached");
-		return 0;
+		return 1;
 	}
-	return 1;
+	return 0;
 }
 
 /**
