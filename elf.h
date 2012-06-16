@@ -31,5 +31,7 @@
 
 void px_elf_maps(void);
 int px_elf_find_symbol(const char*);
+void px_elf_clear(void);
+void px_elf_dump_sections(void);
 
 #endif /* PX_ELF */

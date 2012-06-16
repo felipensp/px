@@ -32,6 +32,11 @@
 #include "maps.h"
 
 /**
+ * Command handler args
+ */
+#define CMD_HANDLER_ARGS const char *params
+
+/**
  * Prompt settings
  */
 #define PX_PROMPT "px!> "
@@ -42,7 +47,7 @@
 typedef struct _px_env {
 	pid_t pid;            /* target process pid */
 	struct {
-		uintptr_t saddr;  /* start address */
+		uintptr_t header; /* start address */
 		uintptr_t got;    /* GOT address */
 		uintptr_t strtab; /* strtab address */
 		uintptr_t symtab; /* symtab address */

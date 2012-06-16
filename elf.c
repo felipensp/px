@@ -122,13 +122,13 @@ void px_elf_maps(void) {
 	uintptr_t addr;
 	int i = 0;
 
-	ptrace_read(ELF(saddr), &header, sizeof(header));
+	ptrace_read(ELF(header), &header, sizeof(header));
 
-	printf("Program header at %#lx\n", ELF(saddr) + header.e_phoff);
+	printf("Program header at %#lx\n", ELF(header) + header.e_phoff);
 
 	/* Locate the PT_DYNAMIC program header */
 	do {
-		ptrace_read(ELF(saddr) + header.e_phoff + i, &phdr, sizeof(phdr));
+		ptrace_read(ELF(header) + header.e_phoff + i, &phdr, sizeof(phdr));
 		i += sizeof(phdr);
 	} while (phdr.p_type != PT_DYNAMIC);
 
@@ -153,4 +153,18 @@ void px_elf_maps(void) {
 	ELF(map) = addr;
 
 	px_elf_find_symbol("foo");
+}
+
+/**
+ * Dumps the ELF sections
+ */
+void px_elf_dump_sections(void) {
+}
+
+/**
+ * Clears the ELF related data
+ */
+void px_elf_clear(void) {
+	ELF(header) = 0;
+	ELF(got) = 0;
 }

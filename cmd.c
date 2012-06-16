@@ -43,6 +43,17 @@ px_env g_env;
 #define PX_STRL(x) x, sizeof(x)-1
 
 /**
+ * Checks for supplied PID
+ */
+inline static int _px_check_pid(void) {
+	if (ENV(pid) == 0) {
+		px_error("Currently there is no pid attached");
+		return 0;
+	}
+	return 1;
+}
+
+/**
  * Finds and call a handler if found
  */
 static int _px_find_cmd(const px_command *cmd_list, char *cmd) {
@@ -79,7 +90,7 @@ static void _px_clear_session() {
 /**
  * quit operation handler
  */
-static void _px_quit_handler(const char *params) {
+static void _px_quit_handler(CMD_HANDLER_ARGS) {
 	if (ENV(pid) != 0) {
 		_px_clear_session();
 	}
@@ -92,7 +103,7 @@ static void _px_quit_handler(const char *params) {
  * attach operation handler
  * attach <pid>
  */
-static void _px_attach_handler(const char *params) {
+static void _px_attach_handler(CMD_HANDLER_ARGS) {
 	pid_t pid = strtol(params, NULL, 10);
 
 	if (ENV(pid) != 0) {
@@ -113,9 +124,8 @@ static void _px_attach_handler(const char *params) {
  * detach operation handler
  * detach (implicitly detaches from the last attached pid)
  */
-static void _px_detach_handler(const char *params) {
-	if (ENV(pid) == 0) {
-		px_error("Currently there is no pid attached");
+static void _px_detach_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
 		return;
 	}
 
@@ -130,11 +140,10 @@ static void _px_detach_handler(const char *params) {
  * signal operation handler
  * signal <number>
  */
-static void _px_signal_handler(const char *params) {
+static void _px_signal_handler(CMD_HANDLER_ARGS) {
 	int signum = atoi(params);
 
-	if (ENV(pid) == 0) {
-		px_error("Currently there is no pid attached");
+	if (_px_check_pid()) {
 		return;
 	}
 
@@ -144,7 +153,7 @@ static void _px_signal_handler(const char *params) {
 /**
  * Maps the memory using the /proc/<pid>/maps information
  */
-static void _px_maps_handler(const char *params) {
+static void _px_maps_handler(CMD_HANDLER_ARGS) {
 	char fname[PATH_MAX], lname[PATH_MAX], *line = NULL;
 	FILE *fp;
 	size_t size;
@@ -178,16 +187,28 @@ static void _px_maps_handler(const char *params) {
 }
 
 /**
+ * show sections operation handler
+ * show sections
+ */
+static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
+		return;
+	}
+	
+	px_elf_dump_sections();
+}
+
+/**
  * show operation handler
  * show <maps | perms>
  */
-static void _px_show_handler(const char *params) {
+static void _px_show_handler(CMD_HANDLER_ARGS) {
 	static const px_command _commands[] = {
+		{PX_STRL("sections"), _px_show_sections_handler},
 		{NULL, 0, NULL}
 	};
 
-	if (ENV(pid) == 0) {
-		px_error("Currently there is no pid attached");
+	if (_px_check_pid()) {
 		return;
 	}
 
@@ -200,7 +221,7 @@ static void _px_show_handler(const char *params) {
  * Finds an specified address in the mapped regions
  * find <address>
  */
-static void _px_find_handler(const char *params) {
+static void _px_find_handler(CMD_HANDLER_ARGS) {
 	uintptr_t addr = 0;
 
 	sscanf(params, "%lx", &addr);
