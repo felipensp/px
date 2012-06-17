@@ -57,5 +57,6 @@ void px_elf_clear(void);
 void px_elf_show_sections(void);
 void px_elf_show_segments(void);
 void px_elf_dump_segment(px_elf_dump);
+void px_elf_show_auxv(void);
 
 #endif /* PX_ELF */

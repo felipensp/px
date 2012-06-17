@@ -63,7 +63,9 @@ void px_maps_region(const char *line) {
 	memcpy(ENV(maps)[n].perms, perms, sizeof(perms));
 
 	/* Sets the base address where we will read ELF data */
-	ELF(header) = ENV(maps)[0].start;
+	if (n == 0) {
+		ELF(header) = ENV(maps)[0].start;
+	}
 
 	++ENV(nregions);
 }

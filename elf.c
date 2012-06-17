@@ -24,10 +24,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <elf.h>
 #include <link.h>
 #include <limits.h>
 #include <string.h>
+#include "common.h"
 #include "cmd.h"
 #include "elf.h"
 #include "ptrace.h"
@@ -291,6 +295,46 @@ void px_elf_dump_segment(px_elf_dump type) {
 	}
 
 	printf("\n");
+}
+
+/**
+ * Find and displays the ELF auxiliar vector
+ */
+void px_elf_show_auxv(void) {
+	ElfW(auxv_t) auxv;
+	char *fmt, filename[PATH_MAX];
+	int fd;
+	
+	snprintf(filename, PATH_MAX, "/proc/%d/auxv", ENV(pid));
+	
+	if ((fd = open(filename, O_RDONLY)) == -1) {
+		px_error("open fail (%m)");
+	}
+		
+	while (read(fd, &auxv, sizeof(auxv)) > 0) {
+		switch (auxv.a_type) {				
+			case AT_HWCAP:        fmt = "AT_HWCAP: %x\n";          break;
+			case AT_PAGESZ:       fmt = "AT_PAGESZ: %ld\n";        break;
+			case AT_CLKTCK:       fmt = "AT_CLKTCK: %ld\n";        break;
+			case AT_PHNUM:        fmt = "AT_PHNUM: %ld\n";         break;
+			case AT_PHENT:        fmt = "AT_PHENT: %ld\n";         break;
+			case AT_PHDR:         fmt = "AT_PHDR: %#lx\n";         break;
+			case AT_BASE:         fmt = "AT_BASE: %#lx\n";         break;
+			case AT_FLAGS:        fmt = "AT_FLAGS: %#lx\n";        break;
+			case AT_SECURE:       fmt = "AT_SECURE: %ld\n";        break;
+			case AT_UID:          fmt = "AT_UID: %ld\n";           break;
+			case AT_GID:          fmt = "AT_GID: %ld\n";           break;
+			case AT_EUID:         fmt = "AT_EUID: %ld\n";          break;
+			case AT_EGID:         fmt = "AT_EGID: %ld\n";          break;
+			case AT_PLATFORM:     fmt = "AT_PLATFORM: %lx\n";      break;
+			case AT_RANDOM:       fmt = "AT_RANDOM: %#lx\n";       break;
+			case AT_ENTRY:        fmt = "AT_ENTRY: %#lx\n";        break;
+			case AT_EXECFN:       fmt = "AT_EXECFN: %#lx\n";       break;
+			case AT_SYSINFO_EHDR: fmt = "AT_SYSINFO_EHDR: %#lx\n"; break;
+			default:              fmt = NULL;                      break;
+		}
+		printf(fmt, auxv.a_un.a_val);
+	}
 }
 
 /**

@@ -216,6 +216,18 @@ static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
 }
 
 /**
+ * show auxv operation handler
+ * show <auxv>
+ */
+static void _px_show_auxv_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
+		return;
+	}
+
+	px_elf_show_auxv();
+}
+
+/**
  * dump text operation handler
  * dump <text>
  */
@@ -247,6 +259,7 @@ static void _px_show_handler(CMD_HANDLER_ARGS) {
 	static const px_command _commands[] = {
 		{PX_STRL("sections"), _px_show_sections_handler},
 		{PX_STRL("segments"), _px_show_segments_handler},
+		{PX_STRL("auxv"),     _px_show_auxv_handler    },
 		{NULL, 0, NULL}
 	};
 
