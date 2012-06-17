@@ -159,6 +159,10 @@ static void _px_maps_handler(CMD_HANDLER_ARGS) {
 	FILE *fp;
 	size_t size;
 
+	if (_px_check_pid()) {
+		return;
+	}
+
 	snprintf(fname, sizeof(fname), "/proc/%d/maps", ENV(pid));
 
 	printf("[+] Starting to read %s...\n", fname);
@@ -189,7 +193,7 @@ static void _px_maps_handler(CMD_HANDLER_ARGS) {
 
 /**
  * show sections operation handler
- * show sections
+ * show <sections>
  */
 static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
 	if (_px_check_pid()) {
@@ -199,6 +203,10 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
 	px_elf_show_sections();
 }
 
+/**
+ * show segments operation handler
+ * show <segments>
+ */
 static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
 	if (_px_check_pid()) {
 		return;
@@ -234,6 +242,10 @@ static void _px_show_handler(CMD_HANDLER_ARGS) {
 static void _px_find_handler(CMD_HANDLER_ARGS) {
 	uintptr_t addr = 0;
 
+	if (_px_check_pid()) {
+		return;
+	}
+
 	sscanf(params, "%lx", &addr);
 
 	if (px_maps_find_region(addr) == 0) {
@@ -256,7 +268,7 @@ static const px_command commands[] = {
 };
 
 /**
- * Prompt
+ * Interactive prompt
  */
 void px_prompt() {
 	char cmd[PX_MAX_CMD_LEN];
@@ -269,6 +281,7 @@ void px_prompt() {
 		cmd_len = strlen(cmd) - 1;
 
 		if (ignore == 1) {
+			/* Stop ignoring multi-line commands */
 			if (cmd[cmd_len] == '\n') {
 				ignore = 0;
 			}
@@ -276,6 +289,7 @@ void px_prompt() {
 		}
 
 		if (cmd[0] != '\n') {
+			/* On multi-line commands we just use the first line */
 			if (cmd[cmd_len] != '\n') {
 				ignore = 1;
 			} else {
