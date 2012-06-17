@@ -245,6 +245,55 @@ void px_elf_show_segments(void) {
 }
 
 /**
+ * Dumps an ELF segment
+ */
+void px_elf_dump_segment(px_elf_dump type) {
+	ElfW(Ehdr) header;
+	ElfW(Shdr) section;
+	uintptr_t sections, offset = 0;
+	int i, j, data;
+	size_t size = 0;
+
+	ptrace_read(ELF(header), &header, sizeof(header));
+
+	/* Section header table offset */
+	sections = ELF(header) + header.e_shoff;
+
+	for (i = 0; i < header.e_shnum; ++i) {
+		ptrace_read(sections + (i * sizeof(section)), &section, sizeof(section));
+
+		switch (type) {
+			case PX_DUMP_TEXT:
+				if (section.sh_addr == header.e_entry) {
+					offset = header.e_entry;
+					size = section.sh_size;
+				}
+				break;
+			case PX_DUMP_DATA:
+			default:
+				break;
+		}
+		/* Stop looping if we found what are looking for */
+		if (offset) {
+			break;
+		}
+	}
+
+	if (offset == 0) {
+		printf("Segment not found!\n");
+		return;
+	}
+
+	/* Dumping the bytes in 4 columns (objdump-like) without hexdump */
+	for (i = j = 0; i < size; i += sizeof(data)) {
+		ptrace_read(offset + i, &data, sizeof(data));
+		printf("%08x%s", data, ++j % 4 ? " " : "\n");
+	}
+
+	printf("\n");
+}
+
+/**
  * Clears the ELF related data
  */
 void px_elf_clear(void) {

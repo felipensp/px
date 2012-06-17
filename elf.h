@@ -43,10 +43,19 @@ typedef struct _px_elf {
  */
 #define ELF(x) ENV(elf.x)
 
+/**
+ * Flags for dump function
+ */
+typedef enum {
+	PX_DUMP_TEXT,
+	PX_DUMP_DATA
+} px_elf_dump;
+
 void px_elf_maps(void);
 int px_elf_find_symbol(const char*);
 void px_elf_clear(void);
 void px_elf_show_sections(void);
 void px_elf_show_segments(void);
+void px_elf_dump_segment(px_elf_dump);
 
 #endif /* PX_ELF */

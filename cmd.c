@@ -216,6 +216,30 @@ static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
 }
 
 /**
+ * dump text operation handler
+ * dump <text>
+ */
+static void _px_dump_text_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
+		return;
+	}
+
+	px_elf_dump_segment(PX_DUMP_TEXT);
+}
+
+/**
+ * dump data operation handler
+ * dump <data>
+ */
+static void _px_dump_data_handler(CMD_HANDLER_ARGS) {
+	if (_px_check_pid()) {
+		return;
+	}
+
+	px_elf_dump_segment(PX_DUMP_DATA);
+}
+
+/**
  * show operation handler
  * show <sections | segments>
  */
@@ -223,6 +247,26 @@ static void _px_show_handler(CMD_HANDLER_ARGS) {
 	static const px_command _commands[] = {
 		{PX_STRL("sections"), _px_show_sections_handler},
 		{PX_STRL("segments"), _px_show_segments_handler},
+		{NULL, 0, NULL}
+	};
+
+	if (_px_check_pid()) {
+		return;
+	}
+
+	if (_px_find_cmd(_commands, (char*)params, 0) == 0) {
+		px_error("Command not found!");
+	}
+}
+
+/**
+ * dump operation handler
+ * dump <text | data>
+ */
+static void _px_dump_handler(CMD_HANDLER_ARGS) {
+	static const px_command _commands[] = {
+		{PX_STRL("text"), _px_dump_text_handler},
+		{PX_STRL("data"), _px_dump_data_handler},
 		{NULL, 0, NULL}
 	};
 
@@ -264,6 +308,7 @@ static const px_command commands[] = {
 	{PX_STRL("maps"),   _px_maps_handler  },
 	{PX_STRL("show"),   _px_show_handler  },
 	{PX_STRL("find"),   _px_find_handler  },
+	{PX_STRL("dump"),   _px_dump_handler  },
 	{NULL, 0, NULL}
 };
 
