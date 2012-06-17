@@ -156,9 +156,9 @@ void px_elf_maps(void) {
 }
 
 /**
- * Dumps the ELF sections
+ * Displays the ELF sections
  */
-void px_elf_dump_sections(void) {
+void px_elf_show_sections(void) {
 	ElfW(Ehdr) header;
 	ElfW(Shdr) section;
 	const char *name;
@@ -204,9 +204,9 @@ void px_elf_dump_sections(void) {
 }
 
 /**
- * Dumps ELF program headers
+ * Displays ELF program headers
  */
-void px_elf_dump_pheaders(void) {
+void px_elf_show_pheaders(void) {
 	ElfW(Ehdr) header;
 	ElfW(Phdr) pheader;
 	uintptr_t pheaders;

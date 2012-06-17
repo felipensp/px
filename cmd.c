@@ -196,7 +196,7 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
 		return;
 	}
 
-	px_elf_dump_sections();
+	px_elf_show_sections();
 }
 
 static void _px_show_pheaders_handler(CMD_HANDLER_ARGS) {
@@ -204,7 +204,7 @@ static void _px_show_pheaders_handler(CMD_HANDLER_ARGS) {
 		return;
 	}
 
-	px_elf_dump_pheaders();
+	px_elf_show_pheaders();
 }
 
 /**
