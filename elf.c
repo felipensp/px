@@ -298,7 +298,7 @@ void px_elf_dump_segment(px_elf_dump type) {
 }
 
 /**
- * Find and displays the ELF auxiliar vector
+ * Displays the ELF auxiliar vector
  */
 void px_elf_show_auxv(void) {
 	ElfW(auxv_t) auxv;
