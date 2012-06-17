@@ -333,7 +333,9 @@ void px_elf_show_auxv(void) {
 			case AT_SYSINFO_EHDR: fmt = "AT_SYSINFO_EHDR: %#lx\n"; break;
 			default:              fmt = NULL;                      break;
 		}
-		printf(fmt, auxv.a_un.a_val);
+		if (fmt) {
+			printf(fmt, auxv.a_un.a_val);
+		}
 	}
 }
 
