@@ -184,7 +184,7 @@ void px_elf_show_sections(void) {
 			case SHT_STRTAB:   name = "STRTAB";   break;
 			case SHT_HASH:     name = "HASH";     break;
 			case SHT_DYNAMIC:  name = "DYNAMIC";  break;
-            case SHT_NOTE:     name = "NOTE";     break;
+			case SHT_NOTE:     name = "NOTE";     break;
 			case SHT_NULL:     name = "NULL";     break;
 			case SHT_PROGBITS: name = "PROGBITS"; break;
 			case SHT_NOBITS:   name = "NOBITS";   break;
