@@ -206,7 +206,7 @@ void px_elf_show_sections(void) {
 /**
  * Displays ELF program headers
  */
-void px_elf_show_pheaders(void) {
+void px_elf_show_segments(void) {
 	ElfW(Ehdr) header;
 	ElfW(Phdr) pheader;
 	uintptr_t pheaders;

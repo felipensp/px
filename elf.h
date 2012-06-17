@@ -47,6 +47,6 @@ void px_elf_maps(void);
 int px_elf_find_symbol(const char*);
 void px_elf_clear(void);
 void px_elf_show_sections(void);
-void px_elf_show_pheaders(void);
+void px_elf_show_segments(void);
 
 #endif /* PX_ELF */

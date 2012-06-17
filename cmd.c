@@ -199,22 +199,22 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
 	px_elf_show_sections();
 }
 
-static void _px_show_pheaders_handler(CMD_HANDLER_ARGS) {
+static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
 	if (_px_check_pid()) {
 		return;
 	}
 
-	px_elf_show_pheaders();
+	px_elf_show_segments();
 }
 
 /**
  * show operation handler
- * show <maps | perms>
+ * show <sections | segments>
  */
 static void _px_show_handler(CMD_HANDLER_ARGS) {
 	static const px_command _commands[] = {
-		{PX_STRL("sections"),        _px_show_sections_handler},
-		{PX_STRL("program headers"), _px_show_pheaders_handler},
+		{PX_STRL("sections"), _px_show_sections_handler},
+		{PX_STRL("segments"), _px_show_segments_handler},
 		{NULL, 0, NULL}
 	};
 
