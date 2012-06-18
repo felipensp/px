@@ -339,21 +339,22 @@ void px_elf_show_auxv(void) {
 				name = NULL;
 				break;
 		}
-		if (name) {
-			switch (type) {
-				case AUXV_STR: {
-						char str[PATH_MAX];
-						ptrace_read(auxv.a_un.a_val, str, sizeof(str));
-						printf("%-15s: %s\n", name, str);
-					}
-					break;
-				case AUXV_INT:
-					printf("%-15s: %ld\n", name, auxv.a_un.a_val);
-					break;
-				case AUXV_HEX:
-					printf("%-15s: %#lx\n", name, auxv.a_un.a_val);
-					break;
-			}
+		if (name == NULL) {
+			continue;
+		}
+		switch (type) {
+			case AUXV_STR: {
+				char str[PATH_MAX];
+				ptrace_read(auxv.a_un.a_val, str, sizeof(str));
+				printf("%-15s: %s\n", name, str);
+				}
+				break;
+			case AUXV_INT:
+				printf("%-15s: %ld\n", name, auxv.a_un.a_val);
+				break;
+			case AUXV_HEX:
+				printf("%-15s: %#lx\n", name, auxv.a_un.a_val);
+				break;
 		}
 	}
 }
