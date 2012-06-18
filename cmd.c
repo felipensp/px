@@ -32,6 +32,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <limits.h>
+#include <inttypes.h>
 #include "common.h"
 #include "cmd.h"
 #include "trace.h"
@@ -303,7 +304,7 @@ static void _px_find_handler(CMD_HANDLER_ARGS) {
 		return;
 	}
 
-	sscanf(params, "%lx", &addr);
+	sscanf(params, "%" PRIxPTR, &addr);
 
 	if (px_maps_find_region(addr) == 0) {
 		px_error("Address not found!");

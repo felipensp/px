@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 #include "common.h"
 #include "maps.h"
 #include "cmd.h"
@@ -42,7 +43,7 @@ void px_maps_region(const char *line) {
 	int offset, dmajor, dminor, inode;
 	const size_t n = ENV(nregions);
 
-	if (sscanf(line, "%lx-%lx %s %x %x:%x %u %s",
+	if (sscanf(line, "%" PRIxPTR "-%" PRIxPTR " %s %x %x:%x %u %s",
 		&start, &end, perms, &offset, &dmajor, &dminor, &inode, filename) < 6 ||
 		(end - start) == 0) {
 		return;

@@ -31,6 +31,7 @@
 #include <link.h>
 #include <limits.h>
 #include <string.h>
+#include <inttypes.h>
 #include "common.h"
 #include "cmd.h"
 #include "elf.h"
@@ -58,11 +59,11 @@ static int _px_elf_resolv_tables(struct link_map *map) {
 				break;
 			case DT_STRTAB:
 				ELF(strtab) = dyn.d_un.d_ptr;
-				printf("Strtab found at %#lx\n", ELF(strtab));
+				printf("Strtab found at %#" PRIxPTR "\n", ELF(strtab));
 				break;
 			case DT_SYMTAB:
 				ELF(symtab) = dyn.d_un.d_ptr;
-				printf("Symtab found at %#lx\n", ELF(symtab));
+				printf("Symtab found at %#" PRIxPTR "\n", ELF(symtab));
 				break;
 		}
 
@@ -128,7 +129,7 @@ void px_elf_maps(void) {
 
 	ptrace_read(ELF(header), &header, sizeof(header));
 
-	printf("Program header at %#lx\n", ELF(header) + header.e_phoff);
+	printf("Program header at %#" PRIxPTR "\n", ELF(header) + header.e_phoff);
 
 	/* Locate the PT_DYNAMIC program header */
 	do {
@@ -148,7 +149,7 @@ void px_elf_maps(void) {
 		}
 	} while (1);
 
-	printf("GOT address at %#lx\n", ELF(got));
+	printf("GOT address at %#" PRIxPTR "\n", ELF(got));
 
 	/* Read the link_map address from the second GOT entry */
 	ptrace_read(ELF(got) + sizeof(void*), &addr, sizeof(void*));
@@ -197,7 +198,7 @@ void px_elf_show_sections(void) {
 			case SHT_HIUSER:   name = "HIUSER";   break;
 			default:           name = "UNKNOWN";  break;
 		}
-		printf(" %-2d | %-8s | %c%c%c   | %#lx\n", i, name,
+		printf(" %-2d | %-8s | %c%c%c   | %#" PRIxPTR "\n", i, name,
 			section.sh_flags & SHF_ALLOC     ? 'A' : '-',
 			section.sh_flags & SHF_WRITE     ? 'W' : '-',
 			section.sh_flags & SHF_EXECINSTR ? 'X' : '-',
@@ -240,7 +241,7 @@ void px_elf_show_segments(void) {
 			default:         name = "UNKNOWN"; break;
 		}
 
-		printf("%-8s | %-8ld | %c%c%c   | %#lx\n", name, pheader.p_filesz,
+		printf("%-8s | %-8u | %c%c%c   | %#" PRIxPTR "\n", name, pheader.p_filesz,
 			pheader.p_flags & PF_X ? 'X' : '-',
 			pheader.p_flags & PF_W ? 'W' : '-',
 			pheader.p_flags & PF_R ? 'R' : '-',
@@ -350,10 +351,10 @@ void px_elf_show_auxv(void) {
 				}
 				break;
 			case AUXV_INT:
-				printf("%-15s: %ld\n", name, auxv.a_un.a_val);
+				printf("%-15s: %u\n", name, auxv.a_un.a_val);
 				break;
 			case AUXV_HEX:
-				printf("%-15s: %#lx\n", name, auxv.a_un.a_val);
+				printf("%-15s: %#" PRIxPTR "\n", name, auxv.a_un.a_val);
 				break;
 		}
 	}

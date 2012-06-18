@@ -39,7 +39,7 @@ typedef struct _px_maps {
 } px_maps;
 
 void px_maps_region(const char *);
-int px_maps_find_region(unsigned long);
+int px_maps_find_region(uintptr_t);
 void px_maps_elf(const char*);
 int px_maps_find_symbol(const char*);
 void px_maps_clear(void);
