@@ -301,40 +301,59 @@ void px_elf_dump_segment(px_elf_dump type) {
  * Displays the ELF auxiliar vector
  */
 void px_elf_show_auxv(void) {
+	enum {AUXV_HEX, AUXV_INT, AUXV_STR} type;
 	ElfW(auxv_t) auxv;
-	char *fmt, filename[PATH_MAX];
+	const char *name;
+	char filename[PATH_MAX];
 	int fd;
-	
+
 	snprintf(filename, PATH_MAX, "/proc/%d/auxv", ENV(pid));
-	
+
 	if ((fd = open(filename, O_RDONLY)) == -1) {
 		px_error("open fail (%m)");
 	}
-		
+
+#define CASE(_name, _type) case _name: name = #_name; type = _type; break
+
 	while (read(fd, &auxv, sizeof(auxv)) > 0) {
-		switch (auxv.a_type) {				
-			case AT_HWCAP:        fmt = "AT_HWCAP: %x\n";          break;
-			case AT_PAGESZ:       fmt = "AT_PAGESZ: %ld\n";        break;
-			case AT_CLKTCK:       fmt = "AT_CLKTCK: %ld\n";        break;
-			case AT_PHNUM:        fmt = "AT_PHNUM: %ld\n";         break;
-			case AT_PHENT:        fmt = "AT_PHENT: %ld\n";         break;
-			case AT_PHDR:         fmt = "AT_PHDR: %#lx\n";         break;
-			case AT_BASE:         fmt = "AT_BASE: %#lx\n";         break;
-			case AT_FLAGS:        fmt = "AT_FLAGS: %#lx\n";        break;
-			case AT_SECURE:       fmt = "AT_SECURE: %ld\n";        break;
-			case AT_UID:          fmt = "AT_UID: %ld\n";           break;
-			case AT_GID:          fmt = "AT_GID: %ld\n";           break;
-			case AT_EUID:         fmt = "AT_EUID: %ld\n";          break;
-			case AT_EGID:         fmt = "AT_EGID: %ld\n";          break;
-			case AT_PLATFORM:     fmt = "AT_PLATFORM: %lx\n";      break;
-			case AT_RANDOM:       fmt = "AT_RANDOM: %#lx\n";       break;
-			case AT_ENTRY:        fmt = "AT_ENTRY: %#lx\n";        break;
-			case AT_EXECFN:       fmt = "AT_EXECFN: %#lx\n";       break;
-			case AT_SYSINFO_EHDR: fmt = "AT_SYSINFO_EHDR: %#lx\n"; break;
-			default:              fmt = NULL;                      break;
+		switch (auxv.a_type) {
+			CASE(AT_HWCAP,  AUXV_HEX);
+			CASE(AT_PAGESZ, AUXV_INT);
+			CASE(AT_CLKTCK, AUXV_INT);
+			CASE(AT_PHNUM,  AUXV_INT);
+			CASE(AT_PHENT,  AUXV_INT);
+			CASE(AT_PHDR,   AUXV_HEX);
+			CASE(AT_BASE,   AUXV_HEX);
+			CASE(AT_FLAGS,  AUXV_HEX);
+			CASE(AT_SECURE, AUXV_INT);
+			CASE(AT_UID,    AUXV_INT);
+			CASE(AT_GID,    AUXV_INT);
+			CASE(AT_EUID,   AUXV_INT);
+			CASE(AT_EGID,   AUXV_INT);
+			CASE(AT_PLATFORM, AUXV_STR);
+			CASE(AT_RANDOM,   AUXV_HEX);
+			CASE(AT_ENTRY,    AUXV_HEX);
+			CASE(AT_EXECFN,   AUXV_STR);
+			CASE(AT_SYSINFO_EHDR, AUXV_HEX);
+			default:
+				name = NULL;
+				break;
 		}
-		if (fmt) {
-			printf(fmt, auxv.a_un.a_val);
+		if (name) {
+			switch (type) {
+				case AUXV_STR: {
+						char str[PATH_MAX];
+						ptrace_read(auxv.a_un.a_val, str, sizeof(str));
+						printf("%-15s: %s\n", name, str);
+					}
+					break;
+				case AUXV_INT:
+					printf("%-15s: %ld\n", name, auxv.a_un.a_val);
+					break;
+				case AUXV_HEX:
+					printf("%-15s: %#lx\n", name, auxv.a_un.a_val);
+					break;
+			}
 		}
 	}
 }
