@@ -46,7 +46,8 @@ px_env g_env;
 /**
  * Checks for supplied PID
  */
-inline static int _px_check_pid(void) {
+inline static int _px_check_pid(void)
+{
 	if (ENV(pid) == 0) {
 		px_error("Currently there is no pid attached");
 		return 1;
@@ -57,7 +58,8 @@ inline static int _px_check_pid(void) {
 /**
  * Finds and call a handler if found
  */
-static int _px_find_cmd(const px_command *cmd_list, char *cmd, int split) {
+static int _px_find_cmd(const px_command *cmd_list, char *cmd, int split)
+{
 	char *params = NULL, *op = split ? strtok_r(cmd, " ", &params) : cmd;
 	const px_command *cmd_ptr = cmd_list;
 	size_t op_len = op ? strlen(op) : 0;
@@ -78,7 +80,8 @@ static int _px_find_cmd(const px_command *cmd_list, char *cmd, int split) {
 /**
  * Clears information about current session
  */
-static void _px_clear_session() {
+static void _px_clear_session()
+{
 	if (ENV(maps) != NULL) {
 		px_maps_clear();
 		px_elf_clear();
@@ -92,7 +95,8 @@ static void _px_clear_session() {
 /**
  * quit operation handler
  */
-static void _px_quit_handler(CMD_HANDLER_ARGS) {
+static void _px_quit_handler(CMD_HANDLER_ARGS)
+{
 	if (ENV(pid) != 0) {
 		_px_clear_session();
 	}
@@ -105,7 +109,8 @@ static void _px_quit_handler(CMD_HANDLER_ARGS) {
  * attach operation handler
  * attach <pid>
  */
-static void _px_attach_handler(CMD_HANDLER_ARGS) {
+static void _px_attach_handler(CMD_HANDLER_ARGS)
+{
 	pid_t pid = strtol(params, NULL, 10);
 
 	if (ENV(pid) != 0) {
@@ -126,7 +131,8 @@ static void _px_attach_handler(CMD_HANDLER_ARGS) {
  * detach operation handler
  * detach (implicitly detaches from the last attached pid)
  */
-static void _px_detach_handler(CMD_HANDLER_ARGS) {
+static void _px_detach_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -142,7 +148,8 @@ static void _px_detach_handler(CMD_HANDLER_ARGS) {
  * signal operation handler
  * signal <number>
  */
-static void _px_signal_handler(CMD_HANDLER_ARGS) {
+static void _px_signal_handler(CMD_HANDLER_ARGS)
+{
 	int signum = atoi(params);
 
 	if (_px_check_pid()) {
@@ -155,7 +162,8 @@ static void _px_signal_handler(CMD_HANDLER_ARGS) {
 /**
  * Maps the memory using the /proc/<pid>/maps information
  */
-static void _px_maps_handler(CMD_HANDLER_ARGS) {
+static void _px_maps_handler(CMD_HANDLER_ARGS)
+{
 	char fname[PATH_MAX], lname[PATH_MAX], *line = NULL;
 	FILE *fp;
 	size_t size;
@@ -196,7 +204,8 @@ static void _px_maps_handler(CMD_HANDLER_ARGS) {
  * show sections operation handler
  * show <sections>
  */
-static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
+static void _px_show_sections_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -208,7 +217,8 @@ static void _px_show_sections_handler(CMD_HANDLER_ARGS) {
  * show segments operation handler
  * show <segments>
  */
-static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
+static void _px_show_segments_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -220,7 +230,8 @@ static void _px_show_segments_handler(CMD_HANDLER_ARGS) {
  * show auxv operation handler
  * show <auxv>
  */
-static void _px_show_auxv_handler(CMD_HANDLER_ARGS) {
+static void _px_show_auxv_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -232,7 +243,8 @@ static void _px_show_auxv_handler(CMD_HANDLER_ARGS) {
  * dump text operation handler
  * dump <text>
  */
-static void _px_dump_text_handler(CMD_HANDLER_ARGS) {
+static void _px_dump_text_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -244,7 +256,8 @@ static void _px_dump_text_handler(CMD_HANDLER_ARGS) {
  * dump data operation handler
  * dump <data>
  */
-static void _px_dump_data_handler(CMD_HANDLER_ARGS) {
+static void _px_dump_data_handler(CMD_HANDLER_ARGS)
+{
 	if (_px_check_pid()) {
 		return;
 	}
@@ -256,7 +269,8 @@ static void _px_dump_data_handler(CMD_HANDLER_ARGS) {
  * show operation handler
  * show <sections | segments>
  */
-static void _px_show_handler(CMD_HANDLER_ARGS) {
+static void _px_show_handler(CMD_HANDLER_ARGS)
+{
 	static const px_command _commands[] = {
 		{PX_STRL("sections"), _px_show_sections_handler},
 		{PX_STRL("segments"), _px_show_segments_handler},
@@ -277,7 +291,8 @@ static void _px_show_handler(CMD_HANDLER_ARGS) {
  * dump operation handler
  * dump <text | data>
  */
-static void _px_dump_handler(CMD_HANDLER_ARGS) {
+static void _px_dump_handler(CMD_HANDLER_ARGS)
+{
 	static const px_command _commands[] = {
 		{PX_STRL("text"), _px_dump_text_handler},
 		{PX_STRL("data"), _px_dump_data_handler},
@@ -297,7 +312,8 @@ static void _px_dump_handler(CMD_HANDLER_ARGS) {
  * Finds an specified address in the mapped regions
  * find <address>
  */
-static void _px_find_handler(CMD_HANDLER_ARGS) {
+static void _px_find_handler(CMD_HANDLER_ARGS)
+{
 	uintptr_t addr = 0;
 
 	if (_px_check_pid()) {
@@ -329,7 +345,8 @@ static const px_command commands[] = {
 /**
  * Interactive prompt
  */
-void px_prompt() {
+void px_prompt(void)
+{
 	char cmd[PX_MAX_CMD_LEN];
 	int ignore = 0, cmd_len;
 

@@ -40,7 +40,8 @@
 /**
  * Resolves the link_map tables
  */
-static int _px_elf_resolv_tables(struct link_map *map) {
+static int _px_elf_resolv_tables(struct link_map *map)
+{
 	ElfW(Dyn) dyn;
 	uintptr_t addr = (uintptr_t) map->l_ld;
 	ElfW(Word) nchains;
@@ -78,7 +79,8 @@ static int _px_elf_resolv_tables(struct link_map *map) {
 /**
  * Finds a symbol in the tables
  */
-int px_elf_find_symbol(const char* name) {
+int px_elf_find_symbol(const char *name)
+{
 	struct link_map map;
 	ElfW(Sym) sym;
 	char str[128], libname[PATH_MAX];
@@ -120,7 +122,8 @@ int px_elf_find_symbol(const char* name) {
 /**
  * Reads the ELF data from the target process
  */
-void px_elf_maps(void) {
+void px_elf_maps(void)
+{
 	ElfW(Ehdr) header;
 	ElfW(Phdr) phdr;
 	ElfW(Dyn) dyn;
@@ -163,7 +166,8 @@ void px_elf_maps(void) {
 /**
  * Displays the ELF sections
  */
-void px_elf_show_sections(void) {
+void px_elf_show_sections(void)
+{
 	ElfW(Ehdr) header;
 	ElfW(Shdr) section;
 	const char *name;
@@ -211,7 +215,8 @@ void px_elf_show_sections(void) {
 /**
  * Displays ELF program headers
  */
-void px_elf_show_segments(void) {
+void px_elf_show_segments(void)
+{
 	ElfW(Ehdr) header;
 	ElfW(Phdr) pheader;
 	uintptr_t pheaders;
@@ -252,7 +257,8 @@ void px_elf_show_segments(void) {
 /**
  * Dumps an ELF segment
  */
-void px_elf_dump_segment(px_elf_dump type) {
+void px_elf_dump_segment(px_elf_dump type)
+{
 	ElfW(Ehdr) header;
 	ElfW(Shdr) section;
 	uintptr_t sections, offset = 0;
@@ -301,7 +307,8 @@ void px_elf_dump_segment(px_elf_dump type) {
 /**
  * Displays the ELF auxiliar vector
  */
-void px_elf_show_auxv(void) {
+void px_elf_show_auxv(void)
+{
 	enum {AUXV_HEX, AUXV_INT, AUXV_STR} type;
 	ElfW(auxv_t) auxv;
 	const char *name;
@@ -363,6 +370,7 @@ void px_elf_show_auxv(void) {
 /**
  * Clears the ELF related data
  */
-void px_elf_clear(void) {
+void px_elf_clear(void)
+{
 	memset(&ENV(elf), 0, sizeof(ENV(elf)));
 }

@@ -34,14 +34,16 @@
 /**
  * Displays the usage of px
  */
-static void usage() {
+static void usage()
+{
 	printf("Usage: px [options]\n\n"
 			"Options:\n"
 			"	-h, --help	Displays this information\n"
 			"	-v, --version	Displays the version\n");
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	char c;
 	int opt_index = 0;
 	static struct option long_opts[] = {

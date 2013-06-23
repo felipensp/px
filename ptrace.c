@@ -32,7 +32,8 @@
 /**
  * Reads memory from the child process
  */
-void ptrace_read(uintptr_t addr, void *vptr, size_t len) {
+void ptrace_read(uintptr_t addr, void *vptr, size_t len)
+{
 	const size_t long_size = sizeof(long);
 	int i = 0, j = len / long_size, is_exact = len % long_size;
 	long word;

@@ -37,7 +37,8 @@
 /**
  * Parses an line from /proc/<pid>/maps
  */
-void px_maps_region(const char *line) {
+void px_maps_region(const char *line)
+{
 	uintptr_t start, end;
 	char perms[5], filename[PATH_MAX];
 	int offset, dmajor, dminor, inode;
@@ -74,7 +75,8 @@ void px_maps_region(const char *line) {
 /**
  * Finds a mapped region by address
  */
-int px_maps_find_region(uintptr_t addr) {
+int px_maps_find_region(uintptr_t addr)
+{
 	int i = 0;
 
 	while (i < ENV(nregions)) {
@@ -91,7 +93,8 @@ int px_maps_find_region(uintptr_t addr) {
 /**
  * Deallocs memory used to the mapped regions
  */
-void px_maps_clear(void) {
+void px_maps_clear(void)
+{
 	if (ENV(maps) != NULL) {
 		free(ENV(maps));
 		ENV(maps) = NULL;
